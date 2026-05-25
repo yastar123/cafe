@@ -26,44 +26,23 @@ function CoffeeCupIllustration() {
 }
 
 const steps = [
-  { icon: UserPlus,        num: '01', title: 'Buat Akun',       desc: 'Daftar gratis dalam 30 detik',           color: 'bg-primary text-primary-foreground' },
-  { icon: UtensilsCrossed, num: '02', title: 'Pilih Menu',      desc: 'Jelajahi 50+ pilihan kopi & hidangan',   color: 'bg-amber-500 text-white' },
-  { icon: CreditCard,      num: '03', title: 'Checkout',        desc: 'Bayar transfer, e-wallet, atau tunai',   color: 'bg-blue-500 text-white' },
-  { icon: PackageCheck,    num: '04', title: 'Ambil & Nikmati', desc: 'Pesanan siap dalam hitungan menit',      color: 'bg-emerald-500 text-white' },
+  { icon: UserPlus,        num: '01', title: 'Buat Akun',       desc: 'Daftar gratis 30 detik',              color: 'bg-primary text-primary-foreground' },
+  { icon: UtensilsCrossed, num: '02', title: 'Pilih Menu',      desc: '50+ kopi & hidangan pilihan',          color: 'bg-amber-500 text-white' },
+  { icon: CreditCard,      num: '03', title: 'Checkout',        desc: 'Bayar sesuai metode pilihanmu',        color: 'bg-blue-500 text-white' },
+  { icon: PackageCheck,    num: '04', title: 'Ambil & Nikmati', desc: 'Siap dalam hitungan menit',            color: 'bg-emerald-500 text-white' },
 ]
 
 const features = [
-  {
-    icon: Coffee,
-    title: 'Kualitas Premium',
-    desc: 'Kopi racikan barista profesional dari biji pilihan dengan cita rasa konsisten setiap hari.',
-    color: 'bg-amber-50 border-amber-200/70',
-    iconBg: 'bg-amber-100',
-    iconColor: 'text-amber-700',
-  },
-  {
-    icon: Zap,
-    title: 'Layanan Cepat',
-    desc: 'Pesan online, ambil di gerai dalam hitungan menit — tanpa antre panjang.',
-    color: 'bg-sky-50 border-sky-200/70',
-    iconBg: 'bg-sky-100',
-    iconColor: 'text-sky-700',
-  },
-  {
-    icon: ShoppingCart,
-    title: 'Pemesanan Mudah',
-    desc: 'Checkout cepat dengan pilihan transfer bank, e-wallet, atau bayar di kasir.',
-    color: 'bg-emerald-50 border-emerald-200/70',
-    iconBg: 'bg-emerald-100',
-    iconColor: 'text-emerald-700',
-  },
+  { icon: Coffee,       title: 'Kualitas Premium',  desc: 'Kopi racikan barista profesional dari biji pilihan dengan cita rasa konsisten.', color: 'bg-amber-50 border-amber-200/70',  iconBg: 'bg-amber-100',  iconColor: 'text-amber-700' },
+  { icon: Zap,          title: 'Layanan Cepat',     desc: 'Pesan online, ambil di gerai dalam hitungan menit — tanpa antre panjang.',       color: 'bg-sky-50 border-sky-200/70',     iconBg: 'bg-sky-100',    iconColor: 'text-sky-700' },
+  { icon: ShoppingCart, title: 'Pemesanan Mudah',   desc: 'Checkout cepat dengan transfer bank, e-wallet, atau bayar di kasir.',            color: 'bg-emerald-50 border-emerald-200/70', iconBg: 'bg-emerald-100', iconColor: 'text-emerald-700' },
 ]
 
 const stats = [
-  { value: '50+', label: 'Pilihan Menu' },
-  { value: '5 min', label: 'Waktu Siap' },
-  { value: '3×', label: 'Metode Bayar' },
-  { value: '100%', label: 'Racikan Barista' },
+  { value: '50+',  label: 'Pilihan Menu' },
+  { value: '5m',   label: 'Waktu Siap' },
+  { value: '3×',   label: 'Metode Bayar' },
+  { value: '100%', label: 'Barista' },
 ]
 
 export default function HomePage() {
@@ -81,23 +60,23 @@ export default function HomePage() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b border-primary/10 bg-background/85 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-sm">
-              <Coffee className="h-5 w-5 text-primary-foreground" />
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center shadow-sm">
+              <Coffee className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-primary" style={{ fontFamily: 'Playfair Display, serif' }}>
+            <span className="text-lg font-bold text-primary" style={{ fontFamily: 'Playfair Display, serif' }}>
               Coffee House
             </span>
           </div>
           <div className="flex gap-2">
             <Link href="/auth/login">
-              <Button variant="outline" size="sm" className="border-primary/25 text-primary hover:bg-primary/5 font-medium h-9">
+              <Button variant="outline" size="sm" className="border-primary/25 text-primary hover:bg-primary/5 font-medium h-8 text-xs px-3">
                 Masuk
               </Button>
             </Link>
             <Link href="/auth/sign-up">
-              <Button size="sm" className="bg-primary hover:bg-primary/90 shadow-sm font-medium h-9">
+              <Button size="sm" className="bg-primary hover:bg-primary/90 shadow-sm font-medium h-8 text-xs px-3">
                 Daftar Gratis
               </Button>
             </Link>
@@ -106,61 +85,60 @@ export default function HomePage() {
       </header>
 
       <main className="flex-1">
-        {/* Hero */}
-        <section className="relative overflow-hidden px-4 pt-12 pb-10 md:pt-16 md:pb-14">
-          {/* Background blobs */}
+        {/* ── Hero ── */}
+        <section className="relative overflow-hidden px-4 pt-8 pb-8 md:pt-14 md:pb-12">
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-primary/6 to-transparent rounded-full translate-x-1/3 -translate-y-1/4" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-accent/6 to-transparent rounded-full -translate-x-1/3 translate-y-1/4" />
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-bl from-primary/6 to-transparent rounded-full translate-x-1/3 -translate-y-1/4" />
+            <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-accent/6 to-transparent rounded-full -translate-x-1/3 translate-y-1/4" />
           </div>
 
           <div className="relative max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-6 md:gap-10 items-center">
-              {/* Text content */}
-              <div className="space-y-5 text-center md:text-left order-2 md:order-1">
-                <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-semibold border border-primary/20">
-                  <Star className="h-3.5 w-3.5 fill-primary" />
+            <div className="grid md:grid-cols-2 gap-5 md:gap-10 items-center">
+
+              {/* Text — order 2 on mobile (below illustration) */}
+              <div className="space-y-4 text-center md:text-left order-2 md:order-1">
+                <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3.5 py-1.5 rounded-full text-xs font-semibold border border-primary/20">
+                  <Star className="h-3 w-3 fill-primary" />
                   Kopi Premium, Layanan Terbaik
                 </div>
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
                   Nikmati Setiap{' '}
                   <span className="text-primary italic">Tegukan</span>{' '}
                   Bersama Kami
                 </h1>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-lg mx-auto md:mx-0">
-                  Pesan kopi & hidangan favorit Anda secara online. Racikan barista profesional, siap dalam hitungan menit.
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-md mx-auto md:mx-0">
+                  Pesan kopi & hidangan favorit secara online. Racikan barista profesional, siap dalam hitungan menit.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+                <div className="flex flex-col sm:flex-row gap-2.5 justify-center md:justify-start">
                   <Link href="/auth/sign-up">
-                    <Button className="bg-primary hover:bg-primary/90 h-12 px-8 text-base font-semibold shadow-md inline-flex items-center gap-2 w-full sm:w-auto press-effect">
+                    <Button className="bg-primary hover:bg-primary/90 h-11 px-7 text-sm font-semibold shadow-md inline-flex items-center gap-2 w-full sm:w-auto press-effect">
                       Mulai Pesan Sekarang
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </Link>
                   <Link href="/auth/login">
-                    <Button variant="outline" className="border-primary/25 h-12 px-8 text-base font-medium text-primary hover:bg-primary/5 w-full sm:w-auto">
+                    <Button variant="outline" className="border-primary/25 h-11 px-7 text-sm font-medium text-primary hover:bg-primary/5 w-full sm:w-auto">
                       Sudah Punya Akun?
                     </Button>
                   </Link>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Bergabung dengan pelanggan setia Coffee House ☕
-                </p>
+                <p className="text-xs text-muted-foreground">Bergabung dengan pelanggan setia Coffee House ☕</p>
               </div>
 
-              {/* Illustration — visible on all screens, centered on mobile */}
+              {/* Illustration — order 1 on mobile (top), smaller */}
               <div className="flex items-center justify-center order-1 md:order-2">
-                <div className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80">
+                <div className="relative w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 lg:w-80 lg:h-80">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/12 to-accent/8 blur-2xl" />
-                  <div className="absolute inset-4 rounded-full bg-gradient-to-br from-primary/8 to-accent/5 border border-primary/10" />
-                  <div className="absolute inset-6">
+                  <div className="absolute inset-3 rounded-full bg-gradient-to-br from-primary/8 to-accent/5 border border-primary/10" />
+                  <div className="absolute inset-5">
                     <CoffeeCupIllustration />
                   </div>
-                  <div className="absolute top-2 -right-2 sm:top-4 sm:-right-4 bg-card border border-primary/15 rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-md">
-                    <p className="text-[11px] sm:text-xs font-bold text-primary">☕ 50+ Menu</p>
+                  {/* Floating badges — hidden on xs to avoid overflow */}
+                  <div className="hidden sm:block absolute top-1 -right-3 md:-right-5 bg-card border border-primary/15 rounded-2xl px-2.5 py-1.5 shadow-md">
+                    <p className="text-[10px] sm:text-xs font-bold text-primary whitespace-nowrap">☕ 50+ Menu</p>
                   </div>
-                  <div className="absolute bottom-6 -left-4 sm:bottom-8 sm:-left-6 bg-card border border-primary/15 rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-md">
-                    <p className="text-[11px] sm:text-xs font-bold text-emerald-600">✓ Siap 5 menit</p>
+                  <div className="hidden sm:block absolute bottom-4 -left-4 md:-left-6 bg-card border border-primary/15 rounded-2xl px-2.5 py-1.5 shadow-md">
+                    <p className="text-[10px] sm:text-xs font-bold text-emerald-600 whitespace-nowrap">✓ Siap 5 menit</p>
                   </div>
                 </div>
               </div>
@@ -168,119 +146,113 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Stats strip */}
-        <section className="border-y border-primary/10 bg-card/60 backdrop-blur-sm px-4 py-5">
+        {/* ── Stats strip ── */}
+        <section className="border-y border-primary/10 bg-card/60 backdrop-blur-sm px-4 py-4">
           <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-0 sm:divide-x sm:divide-primary/10">
+            <div className="grid grid-cols-4 divide-x divide-primary/10">
               {stats.map(({ value, label }) => (
-                <div key={label} className="text-center px-4 py-1">
-                  <p className="text-2xl font-bold text-primary" style={{ fontFamily: 'Playfair Display, serif' }}>{value}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5 font-medium">{label}</p>
+                <div key={label} className="text-center px-2 py-1">
+                  <p className="text-xl sm:text-2xl font-bold text-primary" style={{ fontFamily: 'Playfair Display, serif' }}>{value}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 font-medium">{label}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* How to Order */}
-        <section className="px-4 py-14 md:py-16" style={{ background: 'linear-gradient(180deg, transparent 0%, hsl(25 50% 28% / 0.04) 100%)' }}>
+        {/* ── How to Order ── */}
+        <section className="px-4 py-12 md:py-16" style={{ background: 'linear-gradient(180deg, transparent 0%, hsl(25 50% 28% / 0.04) 100%)' }}>
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-10">
+            <div className="text-center mb-8">
               <span className="inline-block text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-wide border border-primary/20 mb-3">
                 Cara Pesan
               </span>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>
                 4 Langkah Mudah
               </h2>
-              <p className="text-muted-foreground mt-2 text-sm">Dari daftar sampai kopi di tangan — semua dalam hitungan menit</p>
+              <p className="text-muted-foreground mt-1.5 text-sm">Dari daftar sampai kopi di tangan — semua dalam hitungan menit</p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-0">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-0">
               {steps.map(({ icon: Icon, num, title, desc, color }, i) => (
-                <div key={num} className="flex md:flex-col items-start md:items-center gap-4 md:gap-0 md:text-center relative">
+                <div key={num} className="flex flex-col items-center text-center relative">
                   {i < steps.length - 1 && (
                     <div className="hidden md:flex absolute top-6 left-1/2 w-full items-center justify-end pr-3 z-0">
                       <ChevronRight className="h-4 w-4 text-primary/30" />
                     </div>
                   )}
-                  <div className={`relative z-10 w-12 h-12 rounded-2xl ${color} flex items-center justify-center flex-shrink-0 shadow-md md:mx-auto press-effect`}>
+                  <div className={`relative z-10 w-12 h-12 rounded-2xl ${color} flex items-center justify-center shadow-md press-effect`}>
                     <Icon className="h-5 w-5" />
                   </div>
-                  <div className="md:mt-4 md:px-4">
-                    <p className="text-[10px] font-bold text-primary/50 uppercase tracking-widest mb-0.5">{num}</p>
-                    <h4 className="font-bold text-sm text-foreground">{title}</h4>
+                  <div className="mt-3 px-2">
+                    <p className="text-[10px] font-bold text-primary/50 uppercase tracking-widest">{num}</p>
+                    <h4 className="font-bold text-sm text-foreground mt-0.5">{title}</h4>
                     <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{desc}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-10 text-center">
+            <div className="mt-8 text-center">
               <Link href="/auth/sign-up">
                 <Button className="bg-primary hover:bg-primary/90 shadow-sm gap-2 px-6 press-effect">
-                  Mulai Sekarang — Gratis
-                  <ArrowRight className="h-4 w-4" />
+                  Mulai Sekarang — Gratis <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
             </div>
           </div>
         </section>
 
-        {/* Features */}
-        <section className="px-4 pb-16 md:pb-20">
+        {/* ── Features ── */}
+        <section className="px-4 pb-12 md:pb-16">
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-8">
+            <div className="text-center mb-7">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>
                 Kenapa Coffee House?
               </h2>
-              <p className="text-muted-foreground mt-2 text-sm">Kami hadirkan pengalaman kopi terbaik untuk Anda</p>
+              <p className="text-muted-foreground mt-1.5 text-sm">Kami hadirkan pengalaman kopi terbaik untuk Anda</p>
             </div>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
               {features.map(({ icon: Icon, title, desc, color, iconBg, iconColor }) => (
-                <div key={title} className={`${color} border rounded-2xl p-6 space-y-3 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group`}>
-                  <div className={`${iconBg} w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200`}>
-                    <Icon className={`h-6 w-6 ${iconColor}`} />
+                <div key={title} className={`${color} border rounded-2xl p-5 space-y-3 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group`}>
+                  <div className={`${iconBg} w-11 h-11 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200`}>
+                    <Icon className={`h-5 w-5 ${iconColor}`} />
                   </div>
-                  <h3 className="font-bold text-foreground text-base">{title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+                  <h3 className="font-bold text-foreground text-sm">{title}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* CTA banner */}
-        <section className="px-4 pb-16">
+        {/* ── CTA Banner ── */}
+        <section className="px-4 pb-12">
           <div className="max-w-5xl mx-auto">
             <div
-              className="rounded-3xl p-8 md:p-12 text-center relative overflow-hidden"
+              className="rounded-2xl p-7 md:p-12 text-center relative overflow-hidden"
               style={{ background: 'linear-gradient(135deg, hsl(25 55% 20%) 0%, hsl(20 50% 14%) 100%)' }}
             >
               <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-x-1/3 -translate-y-1/3 blur-2xl" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -translate-x-1/4 translate-y-1/4 blur-2xl" />
-                {/* Decorative coffee bean dots */}
-                <div className="absolute top-8 left-8 w-2 h-2 bg-white/20 rounded-full" />
-                <div className="absolute top-16 left-20 w-1.5 h-1.5 bg-white/15 rounded-full" />
-                <div className="absolute bottom-10 right-10 w-2 h-2 bg-white/20 rounded-full" />
+                <div className="absolute top-0 right-0 w-56 h-56 bg-white/5 rounded-full translate-x-1/3 -translate-y-1/3 blur-2xl" />
+                <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/5 rounded-full -translate-x-1/4 translate-y-1/4 blur-2xl" />
               </div>
-              <div className="relative z-10 space-y-4">
-                <p className="text-white/60 text-sm font-semibold uppercase tracking-widest">Bergabung Sekarang</p>
-                <h2 className="text-2xl md:text-3xl font-bold text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
+              <div className="relative z-10 space-y-3">
+                <p className="text-white/60 text-xs font-semibold uppercase tracking-widest">Bergabung Sekarang</p>
+                <h2 className="text-xl md:text-3xl font-bold text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
                   Siap Menikmati Kopi Terbaik?
                 </h2>
-                <p className="text-white/70 text-sm md:text-base max-w-md mx-auto">
+                <p className="text-white/70 text-xs md:text-sm max-w-sm mx-auto">
                   Daftar sekarang dan dapatkan pengalaman memesan kopi yang mudah, cepat, dan menyenangkan.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
                   <Link href="/auth/sign-up">
-                    <Button className="bg-white text-primary hover:bg-white/90 font-semibold px-8 h-12 shadow-lg gap-2 press-effect w-full sm:w-auto">
-                      Daftar Gratis Sekarang
-                      <ArrowRight className="h-4 w-4" />
+                    <Button className="bg-white text-primary hover:bg-white/90 font-semibold px-7 h-11 shadow-lg gap-2 press-effect w-full sm:w-auto">
+                      Daftar Gratis <ArrowRight className="h-4 w-4" />
                     </Button>
                   </Link>
                   <Link href="/auth/login">
-                    <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 h-12 px-8 w-full sm:w-auto">
+                    <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 h-11 px-7 w-full sm:w-auto">
                       Sudah Punya Akun
                     </Button>
                   </Link>
@@ -292,26 +264,21 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-primary/10 bg-background py-8">
+      <footer className="border-t border-primary/10 bg-background py-6">
         <div className="max-w-6xl mx-auto px-4 md:px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
-                <Coffee className="h-4 w-4 text-primary-foreground" />
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+                <Coffee className="h-3.5 w-3.5 text-primary-foreground" />
               </div>
-              <div>
-                <p className="font-bold text-primary text-sm" style={{ fontFamily: 'Playfair Display, serif' }}>Coffee House</p>
-                <p className="text-xs text-muted-foreground">Kopi Premium, Layanan Terbaik</p>
-              </div>
+              <p className="font-bold text-primary text-sm" style={{ fontFamily: 'Playfair Display, serif' }}>Coffee House</p>
             </div>
-
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+            <div className="flex items-center gap-5 text-xs text-muted-foreground">
               <Link href="/auth/login" className="hover:text-primary transition-colors">Masuk</Link>
               <Link href="/auth/sign-up" className="hover:text-primary transition-colors">Daftar</Link>
               <Link href="/menu" className="hover:text-primary transition-colors">Menu</Link>
             </div>
-
-            <p className="text-xs text-muted-foreground">© 2026 Coffee House. Hak cipta dilindungi.</p>
+            <p className="text-xs text-muted-foreground">© 2026 Coffee House.</p>
           </div>
         </div>
       </footer>

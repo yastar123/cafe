@@ -327,6 +327,14 @@
     display: none;
   }
 
+  /* Safe-area inset padding (notched iPhones / Android) */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
   /* Smooth press animation for interactive elements */
   .press-effect {
     transition: transform 0.1s ease, box-shadow 0.1s ease;
