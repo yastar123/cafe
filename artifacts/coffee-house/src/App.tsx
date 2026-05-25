@@ -9,6 +9,7 @@ import SignUpSuccessPage from "@/pages/auth/SignUpSuccessPage";
 import MenuPage from "@/pages/MenuPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import OrderSuccessPage from "@/pages/OrderSuccessPage";
+import OrdersPage from "@/pages/OrdersPage";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminOrdersPage from "@/pages/admin/AdminOrdersPage";
 import AdminMenuPage from "@/pages/admin/AdminMenuPage";
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/auth/sign-up-success" component={SignUpSuccessPage} />
       <Route path="/menu" component={MenuPage} />
       <Route path="/checkout" component={CheckoutPage} />
+      <Route path="/orders" component={OrdersPage} />
       <Route path="/order-success" component={OrderSuccessPage} />
       <Route path="/admin">
         {() => (
