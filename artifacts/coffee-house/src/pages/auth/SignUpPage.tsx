@@ -104,9 +104,9 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel — desktop only */}
+      {/* Left panel — tablet + desktop */}
       <div
-        className="hidden lg:flex lg:w-2/5 xl:w-1/2 flex-col items-center justify-center p-12 relative overflow-hidden"
+        className="hidden md:flex md:w-2/5 xl:w-1/2 flex-col items-center justify-center p-10 xl:p-12 relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, hsl(25 55% 20%) 0%, hsl(20 50% 14%) 100%)' }}
       >
         <div className="absolute inset-0 pointer-events-none">
@@ -153,7 +153,7 @@ export default function SignUpPage() {
         </div>
 
         {/* Mobile: compact top brand bar */}
-        <div className="lg:hidden flex items-center gap-3 px-5 pt-8 pb-4 relative">
+        <div className="md:hidden flex items-center gap-3 px-5 pt-8 pb-4 relative">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
               <Coffee className="h-4 w-4 text-primary-foreground" />
@@ -268,8 +268,8 @@ export default function SignUpPage() {
                   )}
                 </Button>
 
-                {/* Desktop: login link inside card */}
-                <p className="hidden lg:block text-center text-sm text-muted-foreground pt-1">
+                {/* Tablet+: login link inside card */}
+                <p className="hidden md:block text-center text-sm text-muted-foreground pt-1">
                   Sudah punya akun?{' '}
                   <Link href="/auth/login" className="text-primary hover:underline font-semibold">Masuk di Sini</Link>
                 </p>
@@ -277,7 +277,7 @@ export default function SignUpPage() {
             </div>
 
             {/* Mobile perks — vertical list, readable */}
-            <div className="lg:hidden space-y-2">
+            <div className="md:hidden space-y-2">
               {perks.map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-3 bg-card border border-primary/10 rounded-xl px-3.5 py-2.5 shadow-sm">
                   <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">

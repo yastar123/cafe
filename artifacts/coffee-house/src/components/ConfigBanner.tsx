@@ -1,5 +1,5 @@
 import { isSupabaseConfigured } from '@/lib/supabase'
-import { AlertTriangle, X } from 'lucide-react'
+import { AlertTriangle, X, ExternalLink } from 'lucide-react'
 import { useState } from 'react'
 
 export default function ConfigBanner() {
@@ -8,25 +8,32 @@ export default function ConfigBanner() {
   if (isSupabaseConfigured || dismissed) return null
 
   return (
-    <div
-      className="fixed left-0 right-0 z-[45] border-t border-amber-700/30 bg-amber-600/95 backdrop-blur-sm text-white flex items-center gap-3 shadow-lg"
-      style={{ bottom: 0, paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-    >
-      <div className="flex items-center gap-3 px-4 py-2.5 w-full">
-        <AlertTriangle className="h-4 w-4 flex-shrink-0 opacity-90" />
-        <p className="text-xs font-medium flex-1 leading-snug">
-          <strong className="font-bold">Konfigurasi:</strong>{' '}
-          Set <code className="bg-amber-700/60 px-1 py-0.5 rounded text-[11px] font-mono">VITE_SUPABASE_URL</code> dan{' '}
-          <code className="bg-amber-700/60 px-1 py-0.5 rounded text-[11px] font-mono">VITE_SUPABASE_ANON_KEY</code>{' '}
-          di Replit Secrets.
-        </p>
-        <button
-          onClick={() => setDismissed(true)}
-          className="p-1.5 rounded-lg hover:bg-amber-700/50 transition-colors flex-shrink-0"
-          aria-label="Tutup"
-        >
-          <X className="h-4 w-4" />
-        </button>
+    <div className="fixed z-[60] bottom-20 right-3 md:bottom-5 md:right-4 lg:right-5 max-w-[270px] animate-in slide-in-from-bottom-4 fade-in duration-300">
+      <div className="bg-amber-50 border border-amber-200/80 rounded-2xl shadow-xl shadow-amber-900/10 overflow-hidden">
+        {/* Top accent bar */}
+        <div className="h-0.5 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-400" />
+        <div className="p-3.5 flex gap-3">
+          <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-amber-900 leading-snug">Setup Diperlukan</p>
+            <p className="text-[11px] text-amber-700/90 mt-1 leading-relaxed">
+              Tambahkan{' '}
+              <code className="bg-amber-100/80 text-amber-800 px-1 py-0.5 rounded text-[10px] font-mono">SUPABASE_URL</code>
+              {' '}&{' '}
+              <code className="bg-amber-100/80 text-amber-800 px-1 py-0.5 rounded text-[10px] font-mono">ANON_KEY</code>
+              {' '}di Replit Secrets.
+            </p>
+          </div>
+          <button
+            onClick={() => setDismissed(true)}
+            className="flex-shrink-0 p-1 rounded-lg text-amber-500 hover:text-amber-700 hover:bg-amber-100 transition-colors -mt-0.5 -mr-0.5"
+            aria-label="Tutup"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
     </div>
   )
