@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react'
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { Link, useLocation } from 'wouter'
-import { ArrowLeft, Clock, CheckCircle, AlertCircle, Eye, RefreshCw, ShoppingBag } from 'lucide-react'
+import {
+  ArrowLeft, Clock, CheckCircle, AlertCircle, Eye,
+  RefreshCw, ShoppingBag, Coffee, LogOut,
+} from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 import OrderModal from '@/components/OrderModal'
 import { toast } from 'sonner'
@@ -25,14 +21,18 @@ interface Order {
   created_at: string
 }
 
-const statusColors: Record<string, string> = {
-  pending: 'bg-amber-50 border-amber-200 text-amber-900',
-  confirmed: 'bg-green-50 border-green-200 text-green-900',
-  rejected: 'bg-red-50 border-red-200 text-red-900',
-  preparing: 'bg-blue-50 border-blue-200 text-blue-900',
-  ready: 'bg-emerald-50 border-emerald-200 text-emerald-900',
-  completed: 'bg-slate-50 border-slate-200 text-slate-900',
-  cancelled: 'bg-rose-50 border-rose-200 text-rose-900',
+const paymentStatusCfg: Record<string, { label: string; cls: string }> = {
+  pending:   { label: 'Menunggu Konfirmasi', cls: 'bg-amber-50 border-amber-200 text-amber-800' },
+  confirmed: { label: 'Lunas / Diterima',   cls: 'bg-green-50 border-green-200 text-green-800' },
+  rejected:  { label: 'Ditolak',            cls: 'bg-red-50 border-red-200 text-red-800' },
+}
+
+const orderStatusCfg: Record<string, { label: string; cls: string; icon?: React.ElementType }> = {
+  pending:   { label: 'Antrean',       cls: 'bg-amber-50 border-amber-200 text-amber-800',     icon: Clock },
+  preparing: { label: 'Sedang Dibuat', cls: 'bg-blue-50 border-blue-200 text-blue-800' },
+  ready:     { label: 'Siap Diambil',  cls: 'bg-emerald-50 border-emerald-200 text-emerald-800', icon: CheckCircle },
+  completed: { label: 'Selesai',       cls: 'bg-slate-50 border-slate-200 text-slate-700' },
+  cancelled: { label: 'Dibatalkan',    cls: 'bg-rose-50 border-rose-200 text-rose-800',        icon: AlertCircle },
 }
 
 export default function OrdersPage() {
@@ -78,164 +78,143 @@ export default function OrdersPage() {
     setLocation('/auth/login')
   }
 
-  const getPaymentStatusText = (status: string) => {
-    switch (status) {
-      case 'pending': return 'Menunggu Konfirmasi'
-      case 'confirmed': return 'Lunas / Diterima'
-      case 'rejected': return 'Ditolak'
-      default: return status
-    }
-  }
-
-  const getOrderStatusText = (status: string) => {
-    switch (status) {
-      case 'pending': return 'Antrean'
-      case 'preparing': return 'Sedang Dibuat'
-      case 'ready': return 'Siap Diambil'
-      case 'completed': return 'Selesai'
-      case 'cancelled': return 'Dibatalkan'
-      default: return status
-    }
-  }
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-primary/10 bg-background/90 backdrop-blur">
-        <div className="flex items-center justify-between max-w-4xl mx-auto px-4 md:px-6 py-3 gap-3">
-          <Link
-            href="/menu"
-            className="flex items-center gap-2 text-primary hover:underline font-semibold text-sm flex-shrink-0"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">Kembali ke Menu</span>
-            <span className="sm:hidden">Menu</span>
-          </Link>
-          <h1 className="text-lg md:text-2xl font-bold text-primary">Pesanan Saya</h1>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
-            className="text-muted-foreground hover:text-red-500 hover:bg-red-50 flex-shrink-0"
-          >
-            Keluar
-          </Button>
+      <header className="sticky top-0 z-40 border-b border-primary/10 bg-background/95 backdrop-blur-sm shadow-sm">
+        <div className="max-w-3xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <Link
+              href="/menu"
+              className="p-1.5 rounded-lg hover:bg-primary/8 transition-colors text-muted-foreground hover:text-primary"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+                <Coffee className="h-3.5 w-3.5 text-primary-foreground" />
+              </div>
+              <span className="font-bold text-primary text-base" style={{ fontFamily: 'Playfair Display, serif' }}>
+                Pesanan Saya
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={fetchOrders}
+              className="border-primary/15 gap-1.5 h-8 text-xs rounded-xl"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Segarkan</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="text-muted-foreground hover:text-red-500 hover:bg-red-50 h-8 px-2.5 rounded-xl text-xs gap-1.5"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Keluar</span>
+            </Button>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 md:px-6 py-6">
-        <div className="flex justify-between items-center mb-5">
-          <div>
-            <h2 className="text-xl font-bold text-foreground">Riwayat Pesanan</h2>
-            <p className="text-sm text-muted-foreground">Pantau status pesanan aktif Anda</p>
-          </div>
-          <Button size="sm" variant="outline" onClick={fetchOrders} className="border-primary/15">
-            <RefreshCw className="h-4 w-4 mr-1.5" />
-            <span className="hidden sm:inline">Segarkan</span>
-          </Button>
+      <div className="max-w-3xl mx-auto px-4 md:px-6 py-6">
+        {/* Page title */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>
+            Riwayat Pesanan
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Pantau status semua pesanan Anda</p>
         </div>
 
         {isLoading ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-28 rounded-lg bg-primary/5 animate-pulse" />
+              <div key={i} className="h-28 rounded-2xl bg-primary/5 animate-pulse" />
             ))}
           </div>
         ) : orders.length === 0 ? (
-          <Card className="border-primary/10">
-            <CardContent className="pt-10 pb-10 text-center space-y-4">
-              <ShoppingBag className="h-12 w-12 mx-auto text-primary/30" />
-              <p className="text-muted-foreground">Anda belum pernah memesan apa pun.</p>
-              <Link href="/menu">
-                <Button className="bg-primary hover:bg-primary/90">
-                  Mulai Pesan Sekarang
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          <div className="bg-card border border-primary/10 rounded-2xl p-12 text-center space-y-4 shadow-sm">
+            <div className="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto">
+              <ShoppingBag className="h-7 w-7 text-primary/30" />
+            </div>
+            <div>
+              <p className="font-semibold text-foreground/80">Belum ada pesanan</p>
+              <p className="text-sm text-muted-foreground mt-1">Yuk, mulai pesan kopi favoritmu!</p>
+            </div>
+            <Link href="/menu">
+              <Button className="bg-primary hover:bg-primary/90 shadow-sm rounded-xl">
+                Pesan Sekarang
+              </Button>
+            </Link>
+          </div>
         ) : (
-          <div className="space-y-4">
-            {orders.map((order) => (
-              <Card
-                key={order.id}
-                className="border-primary/10 hover:shadow-md transition-all"
-              >
-                <CardHeader className="pb-3 pt-4 px-4 bg-gradient-to-r from-primary/5 to-accent/5">
-                  <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="space-y-3">
+            {orders.map((order) => {
+              const pCfg = paymentStatusCfg[order.payment_status] ?? { label: order.payment_status, cls: 'bg-gray-50 border-gray-200 text-gray-700' }
+              const oCfg = orderStatusCfg[order.order_status] ?? { label: order.order_status, cls: 'bg-gray-50 border-gray-200 text-gray-700' }
+              const OIcon = oCfg.icon
+              return (
+                <div
+                  key={order.id}
+                  className="bg-card border border-primary/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-primary/20 transition-all"
+                >
+                  {/* Order header */}
+                  <div className="bg-gradient-to-r from-primary/6 to-accent/5 px-4 py-3 flex items-center justify-between border-b border-primary/8">
                     <div>
-                      <CardTitle className="text-base font-bold text-primary">
-                        Pesanan #{order.id.slice(0, 8).toUpperCase()}
-                      </CardTitle>
-                      <CardDescription className="text-xs mt-0.5">
+                      <p className="text-xs font-bold text-primary">
+                        #{order.id.slice(0, 8).toUpperCase()}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {new Date(order.created_at).toLocaleDateString('id-ID', {
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}{' '}
-                        pukul {new Date(order.created_at).toLocaleTimeString('id-ID')}
-                      </CardDescription>
+                          weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+                        })}
+                        {' pukul '}
+                        {new Date(order.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
                     </div>
-                    <p className="text-lg font-bold text-primary">
-                      {formatRupiah(order.total_amount)}
-                    </p>
+                    <p className="text-base font-bold text-primary">{formatRupiah(order.total_amount)}</p>
                   </div>
-                </CardHeader>
-                <CardContent className="pt-4 pb-4 px-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
-                    <div>
-                      <p className="text-xs text-muted-foreground font-medium mb-1">
-                        Metode Pembayaran
-                      </p>
-                      <p className="text-sm font-semibold">{order.payment_method}</p>
+
+                  {/* Order body */}
+                  <div className="px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex flex-wrap gap-4">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide mb-1">Pembayaran</p>
+                        <span className={`text-xs px-2.5 py-0.5 rounded-full border font-semibold ${pCfg.cls}`}>
+                          {pCfg.label}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide mb-1">Status</p>
+                        <span className={`text-xs px-2.5 py-0.5 rounded-full border font-semibold inline-flex items-center gap-1 ${oCfg.cls}`}>
+                          {OIcon && <OIcon className="h-3 w-3" />}
+                          {oCfg.label}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide mb-1">Metode</p>
+                        <p className="text-xs font-semibold text-foreground">{order.payment_method}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground font-medium mb-1">
-                        Status Pembayaran
-                      </p>
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded text-xs font-semibold border ${
-                          statusColors[order.payment_status] || 'bg-gray-50 border-gray-200 text-gray-800'
-                        }`}
-                      >
-                        {getPaymentStatusText(order.payment_status)}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground font-medium mb-1">
-                        Status Pesanan
-                      </p>
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold border ${
-                          statusColors[order.order_status] || 'bg-gray-50 border-gray-200 text-gray-800'
-                        }`}
-                      >
-                        {order.order_status === 'pending' && <Clock className="h-3 w-3" />}
-                        {order.order_status === 'ready' && <CheckCircle className="h-3 w-3" />}
-                        {['cancelled', 'rejected'].includes(order.order_status) && (
-                          <AlertCircle className="h-3 w-3" />
-                        )}
-                        {getOrderStatusText(order.order_status)}
-                      </span>
-                    </div>
-                    <div className="sm:text-right">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setSelectedOrder(order)
-                          setIsModalOpen(true)
-                        }}
-                        className="border-primary/20 hover:bg-primary/5 text-primary text-xs"
-                      >
-                        <Eye className="h-3.5 w-3.5 mr-1" />
-                        Detail Pesanan
-                      </Button>
-                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => { setSelectedOrder(order); setIsModalOpen(true) }}
+                      className="border-primary/20 hover:bg-primary/5 text-primary text-xs h-8 gap-1.5 rounded-xl flex-shrink-0"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                      Detail
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                </div>
+              )
+            })}
           </div>
         )}
       </div>
@@ -244,10 +223,7 @@ export default function OrdersPage() {
         <OrderModal
           order={selectedOrder}
           isOpen={isModalOpen}
-          onClose={() => {
-            setSelectedOrder(null)
-            setIsModalOpen(false)
-          }}
+          onClose={() => { setSelectedOrder(null); setIsModalOpen(false) }}
           onUpdate={() => {}}
           isAdminView={false}
         />
