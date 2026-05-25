@@ -98,9 +98,14 @@ export default function AdminMenuPage() {
   return (
     <div className="p-4 md:p-8">
       <div className="flex justify-between items-start mb-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Daftar Menu</h1>
-          <p className="text-sm text-muted-foreground">Tambah, ubah, atau hapus menu</p>
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mt-0.5">
+            <Coffee className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>Daftar Menu</h1>
+            <p className="text-sm text-muted-foreground">Tambah, ubah, atau hapus menu</p>
+          </div>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!open) handleDialogClose() }}>
           <DialogTrigger asChild>
@@ -156,23 +161,23 @@ export default function AdminMenuPage() {
           ))}
         </div>
       ) : items.length === 0 ? (
-        <div className="text-center py-16 border-2 border-dashed border-primary/15 rounded-xl">
+        <div className="text-center py-16 border-2 border-dashed border-primary/15 rounded-2xl">
           <Coffee className="h-10 w-10 mx-auto text-primary/30 mb-3" />
           <p className="text-muted-foreground text-sm">Belum ada menu. Klik "Tambah Menu" untuk membuat menu baru.</p>
         </div>
       ) : (
         <div className="space-y-5">
           {categories.map((category) => (
-            <Card key={category} className="border-primary/10">
-              <CardHeader className="pb-2 pt-4 px-4">
-                <CardTitle className="capitalize text-base">{category}</CardTitle>
+            <Card key={category} className="border-primary/10 rounded-2xl overflow-hidden">
+              <CardHeader className="pb-2 pt-4 px-4 bg-gradient-to-r from-primary/6 to-accent/4 border-b border-primary/8">
+                <CardTitle className="capitalize text-sm font-bold text-primary uppercase tracking-wide">{category}</CardTitle>
               </CardHeader>
-              <CardContent className="px-4 pb-4">
+              <CardContent className="px-4 pb-4 pt-3">
                 <div className="space-y-2">
                   {items.filter((i) => i.category === category).map((item) => (
                     <div
                       key={item.id}
-                      className={`flex items-center justify-between p-3 border border-primary/10 rounded-lg hover:bg-primary/5 transition-colors ${!item.available ? 'opacity-60' : ''}`}
+                      className={`flex items-center justify-between p-3 border border-primary/10 rounded-xl hover:bg-primary/4 transition-colors ${!item.available ? 'opacity-60' : ''}`}
                     >
                       <div className="flex-1 min-w-0 mr-3">
                         <p className="font-semibold text-sm truncate">{item.name}</p>

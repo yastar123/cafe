@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Trash2, Edit2, Plus, CreditCard, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Trash2, Edit2, Plus, CreditCard, ToggleLeft, ToggleRight, Building2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface PaymentChannel {
@@ -92,9 +92,14 @@ export default function AdminPaymentsPage() {
   return (
     <div className="p-4 md:p-8">
       <div className="flex justify-between items-start mb-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Metode Pembayaran</h1>
-          <p className="text-sm text-muted-foreground">Kelola metode transfer bank dan e-wallet</p>
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mt-0.5">
+            <Building2 className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>Metode Pembayaran</h1>
+            <p className="text-sm text-muted-foreground">Kelola transfer bank dan e-wallet</p>
+          </div>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!open) handleDialogClose() }}>
           <DialogTrigger asChild>

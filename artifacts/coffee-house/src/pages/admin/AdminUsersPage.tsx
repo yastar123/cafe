@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Trash2, Edit2, RefreshCw } from 'lucide-react'
+import { Trash2, Edit2, RefreshCw, Users, Search } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface User {
@@ -79,25 +79,33 @@ export default function AdminUsersPage() {
   return (
     <div className="p-4 md:p-8">
       <div className="flex justify-between items-start mb-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Pengguna</h1>
-          <p className="text-sm text-muted-foreground">Kelola akun pengguna terdaftar</p>
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mt-0.5">
+            <Users className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>Pengguna</h1>
+            <p className="text-sm text-muted-foreground">Kelola akun pengguna terdaftar</p>
+          </div>
         </div>
-        <Button size="sm" variant="outline" onClick={fetchUsers} className="border-primary/15 flex-shrink-0">
-          <RefreshCw className="h-4 w-4 mr-1.5" />
-          <span className="hidden sm:inline">Segarkan</span>
+        <Button size="sm" variant="outline" onClick={fetchUsers} className="border-primary/15 flex-shrink-0 rounded-xl gap-1.5">
+          <RefreshCw className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline text-xs">Segarkan</span>
         </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-5">
-        <Input
-          placeholder="Cari nama atau email..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 border-primary/20 text-sm"
-        />
+      <div className="flex flex-col sm:flex-row gap-2.5 mb-5">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Input
+            placeholder="Cari nama atau email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9 flex-1 border-primary/20 text-sm rounded-xl h-9"
+          />
+        </div>
         <Select value={filterRole} onValueChange={setFilterRole}>
-          <SelectTrigger className="sm:w-40 border-primary/20 bg-background text-sm">
+          <SelectTrigger className="sm:w-40 border-primary/20 bg-background text-sm rounded-xl h-9">
             <SelectValue placeholder="Semua Peran" />
           </SelectTrigger>
           <SelectContent>
@@ -114,15 +122,17 @@ export default function AdminUsersPage() {
             <div key={i} className="h-16 rounded-lg bg-primary/5 animate-pulse" />
           ))}
         </div>
+      ) : filteredUsers.length === 0 ? (
+        <div className="text-center py-16 border border-dashed border-primary/20 rounded-2xl">
+          <Users className="h-10 w-10 mx-auto text-primary/30 mb-3" />
+          <p className="text-muted-foreground text-sm">Tidak ada pengguna ditemukan</p>
+        </div>
       ) : (
-        <Card className="border-primary/10">
-          <CardContent className="pt-5">
-            {filteredUsers.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">Tidak ada pengguna ditemukan</p>
-            ) : (
-              <div className="space-y-3">
-                {filteredUsers.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-3 border border-primary/10 rounded-lg hover:bg-primary/5 transition-colors gap-3">
+        <Card className="border-primary/10 rounded-2xl overflow-hidden">
+          <CardContent className="pt-4 px-4 pb-4">
+            <div className="space-y-2">
+              {filteredUsers.map((user) => (
+                  <div key={user.id} className="flex items-center justify-between p-3 border border-primary/10 rounded-xl hover:bg-primary/4 transition-colors gap-3">
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-sm truncate">{user.username}</p>
                       <p className="text-xs text-muted-foreground truncate">{user.email}</p>
@@ -177,8 +187,7 @@ export default function AdminUsersPage() {
                     </div>
                   </div>
                 ))}
-              </div>
-            )}
+            </div>
           </CardContent>
         </Card>
       )}
