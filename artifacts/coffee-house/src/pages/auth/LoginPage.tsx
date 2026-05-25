@@ -9,8 +9,8 @@ import bcrypt from 'bcryptjs'
 import { Coffee, Eye, EyeOff, AlertCircle, ArrowRight, Star, Zap, CreditCard } from 'lucide-react'
 
 const perks = [
-  { icon: Coffee,     label: '50+ pilihan menu kopi & hidangan' },
-  { icon: Zap,        label: 'Siap diambil dalam 5 menit' },
+  { icon: Coffee,     label: '50+ pilihan menu kopi & hidangan segar' },
+  { icon: Zap,        label: 'Pesanan siap diambil dalam 5 menit' },
   { icon: CreditCard, label: 'Bayar transfer, e-wallet, atau tunai' },
 ]
 
@@ -53,7 +53,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel — desktop only */}
+      {/* ── Left panel — desktop only ── */}
       <div
         className="hidden lg:flex lg:w-2/5 xl:w-1/2 flex-col items-center justify-center p-12 relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, hsl(25 55% 20%) 0%, hsl(20 50% 14%) 100%)' }}
@@ -82,10 +82,12 @@ export default function LoginPage() {
               Kopi premium, barista profesional, siap dalam hitungan menit.
             </p>
           </div>
-          <div className="space-y-3 text-left">
+          <div className="space-y-2.5 text-left">
             {perks.map(({ icon: Icon, label }) => (
-              <div key={label} className="flex items-center gap-3 text-white/70 text-sm bg-white/5 rounded-xl px-4 py-2.5 border border-white/10">
-                <Icon className="h-4 w-4 text-white/50 flex-shrink-0" />
+              <div key={label} className="flex items-center gap-3 text-white/75 text-sm bg-white/6 rounded-xl px-4 py-3 border border-white/10">
+                <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <Icon className="h-3.5 w-3.5 text-white/70" />
+                </div>
                 {label}
               </div>
             ))}
@@ -93,32 +95,32 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right panel — form */}
+      {/* ── Right panel — form ── */}
       <div className="flex-1 flex flex-col bg-background relative overflow-hidden">
-        {/* Subtle background blobs */}
+        {/* Subtle bg decoration */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-primary/5 to-transparent rounded-full translate-x-1/3 -translate-y-1/4" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-accent/5 to-transparent rounded-full -translate-x-1/4 translate-y-1/4" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-primary/5 to-transparent rounded-full translate-x-1/3 -translate-y-1/4 blur-2xl" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-accent/5 to-transparent rounded-full -translate-x-1/4 translate-y-1/4 blur-2xl" />
         </div>
 
         {/* Mobile: compact top brand bar */}
-        <div className="lg:hidden flex items-center gap-3 px-5 pt-8 pb-4">
+        <div className="lg:hidden flex items-center gap-3 px-5 pt-8 pb-2 relative">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-              <Coffee className="h-4.5 w-4.5 text-primary-foreground" />
+              <Coffee className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="text-lg font-bold text-primary" style={{ fontFamily: 'Playfair Display, serif' }}>
               Coffee House
             </span>
           </Link>
-          <span className="ml-auto text-xs text-muted-foreground">
+          <span className="ml-auto text-xs text-muted-foreground shrink-0">
             Belum punya akun?{' '}
             <Link href="/auth/sign-up" className="text-primary font-semibold hover:underline">Daftar</Link>
           </span>
         </div>
 
-        {/* Form area */}
-        <div className="flex-1 flex flex-col justify-center px-5 sm:px-8 pb-8 relative">
+        {/* Form area — starts a bit from top, not dead-center */}
+        <div className="flex-1 flex flex-col justify-center px-5 sm:px-8 py-6 relative">
           <div className="w-full max-w-sm mx-auto space-y-5">
             <div>
               <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>
@@ -183,7 +185,6 @@ export default function LoginPage() {
                   )}
                 </Button>
 
-                {/* Desktop only: register link inside card */}
                 <p className="hidden lg:block text-center text-sm text-muted-foreground pt-1">
                   Belum punya akun?{' '}
                   <Link href="/auth/sign-up" className="text-primary hover:underline font-semibold">
@@ -193,12 +194,14 @@ export default function LoginPage() {
               </form>
             </div>
 
-            {/* Mobile perks strip — compact horizontal */}
-            <div className="lg:hidden grid grid-cols-3 gap-2">
+            {/* Mobile perks — vertical list, readable */}
+            <div className="lg:hidden space-y-2">
               {perks.map(({ icon: Icon, label }) => (
-                <div key={label} className="bg-card border border-primary/10 rounded-xl p-2.5 text-center">
-                  <Icon className="h-4 w-4 text-primary/60 mx-auto mb-1" />
-                  <p className="text-[10px] text-muted-foreground leading-tight">{label}</p>
+                <div key={label} className="flex items-center gap-3 bg-card border border-primary/10 rounded-xl px-3.5 py-2.5 shadow-sm">
+                  <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-snug">{label}</p>
                 </div>
               ))}
             </div>

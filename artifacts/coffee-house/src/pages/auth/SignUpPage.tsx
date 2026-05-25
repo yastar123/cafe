@@ -276,12 +276,14 @@ export default function SignUpPage() {
               </form>
             </div>
 
-            {/* Mobile perks strip */}
-            <div className="lg:hidden grid grid-cols-3 gap-2">
+            {/* Mobile perks — vertical list, readable */}
+            <div className="lg:hidden space-y-2">
               {perks.map(({ icon: Icon, label }) => (
-                <div key={label} className="bg-card border border-primary/10 rounded-xl p-2.5 text-center">
-                  <Icon className="h-4 w-4 text-primary/60 mx-auto mb-1" />
-                  <p className="text-[10px] text-muted-foreground leading-tight">{label}</p>
+                <div key={label} className="flex items-center gap-3 bg-card border border-primary/10 rounded-xl px-3.5 py-2.5 shadow-sm">
+                  <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-snug">{label}</p>
                 </div>
               ))}
             </div>
