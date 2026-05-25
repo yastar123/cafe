@@ -6,7 +6,13 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
 import bcrypt from 'bcryptjs'
-import { Coffee, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react'
+import { Coffee, Eye, EyeOff, AlertCircle, ArrowRight, Star, Zap, CreditCard } from 'lucide-react'
+
+const perks = [
+  { icon: Coffee,     label: '50+ pilihan menu kopi & hidangan' },
+  { icon: Zap,        label: 'Siap diambil dalam 5 menit' },
+  { icon: CreditCard, label: 'Bayar transfer, e-wallet, atau tunai' },
+]
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
@@ -54,21 +60,30 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel — decorative, hidden on mobile */}
+      {/* Left panel — decorative */}
       <div
         className="hidden lg:flex lg:w-2/5 xl:w-1/2 flex-col items-center justify-center p-12 relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, hsl(25 55% 20%) 0%, hsl(20 50% 14%) 100%)' }}
       >
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-white/5 rounded-full blur-2xl" />
+          <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-56 h-56 bg-white/5 rounded-full blur-2xl" />
+          {/* Decorative dots */}
+          <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full" />
+          <div className="absolute top-24 left-24 w-1.5 h-1.5 bg-white/15 rounded-full" />
+          <div className="absolute bottom-12 right-12 w-2 h-2 bg-white/20 rounded-full" />
+          <div className="absolute bottom-28 right-28 w-1.5 h-1.5 bg-white/15 rounded-full" />
         </div>
 
-        <div className="relative z-10 text-center space-y-6 max-w-xs">
-          <div className="w-20 h-20 rounded-3xl bg-white/15 flex items-center justify-center mx-auto backdrop-blur-sm border border-white/20">
+        <div className="relative z-10 text-center space-y-8 max-w-xs">
+          <div className="w-20 h-20 rounded-3xl bg-white/15 flex items-center justify-center mx-auto backdrop-blur-sm border border-white/20 shadow-xl">
             <Coffee className="h-10 w-10 text-white" />
           </div>
           <div>
+            <div className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-full px-3 py-1 mb-4">
+              <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
+              <span className="text-white/80 text-xs font-medium">Kopi Premium</span>
+            </div>
             <h2 className="text-3xl font-bold text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
               Coffee House
             </h2>
@@ -76,11 +91,11 @@ export default function LoginPage() {
               Kopi premium, barista profesional, siap dalam hitungan menit.
             </p>
           </div>
-          <div className="space-y-3">
-            {['☕ 50+ pilihan menu', '⚡ Siap dalam 5 menit', '✓ Bayar fleksibel'].map((item) => (
-              <div key={item} className="flex items-center gap-2 text-white/70 text-sm">
-                <span className="w-1.5 h-1.5 bg-white/40 rounded-full" />
-                {item}
+          <div className="space-y-3 text-left">
+            {perks.map(({ icon: Icon, label }) => (
+              <div key={label} className="flex items-center gap-3 text-white/70 text-sm bg-white/5 rounded-xl px-4 py-2.5 border border-white/10">
+                <Icon className="h-4 w-4 text-white/50 flex-shrink-0" />
+                {label}
               </div>
             ))}
           </div>
@@ -88,14 +103,14 @@ export default function LoginPage() {
       </div>
 
       {/* Right panel — form */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 bg-background relative overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-center p-5 sm:p-8 bg-background relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-primary/5 to-transparent rounded-full translate-x-1/3 -translate-y-1/4" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-accent/5 to-transparent rounded-full -translate-x-1/4 translate-y-1/4" />
         </div>
 
         <div className="relative w-full max-w-sm space-y-7">
-          {/* Mobile logo only */}
+          {/* Mobile logo */}
           <div className="lg:hidden text-center">
             <Link href="/" className="inline-flex flex-col items-center gap-2 hover:opacity-80 transition-opacity">
               <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-lg">
@@ -107,7 +122,7 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {/* Form header */}
+          {/* Header */}
           <div>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>
               Selamat Datang
@@ -117,9 +132,8 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Card */}
+          {/* Form card */}
           <div className="bg-card border border-primary/12 rounded-2xl shadow-lg overflow-hidden">
-            {/* Accent top bar */}
             <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary/50" />
 
             <form onSubmit={handleLogin} className="px-6 py-6 space-y-4">
@@ -133,7 +147,7 @@ export default function LoginPage() {
                   autoComplete="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="border-primary/20 focus:border-primary/50 h-10 rounded-xl"
+                  className="border-primary/20 focus:border-primary/50 h-11 rounded-xl"
                 />
               </div>
 
@@ -148,12 +162,12 @@ export default function LoginPage() {
                     autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="border-primary/20 focus:border-primary/50 h-10 rounded-xl pr-10"
+                    className="border-primary/20 focus:border-primary/50 h-11 rounded-xl pr-11"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -169,7 +183,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-primary hover:bg-primary/90 font-semibold h-11 rounded-xl shadow-sm gap-2"
+                className="w-full bg-primary hover:bg-primary/90 font-semibold h-11 rounded-xl shadow-sm gap-2 press-effect"
                 disabled={isLoading}
               >
                 {isLoading ? (

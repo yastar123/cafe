@@ -9,7 +9,7 @@ import {
 
 function CoffeeCupIllustration() {
   return (
-    <svg viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+    <svg viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-xl">
       <path d="M110 60 C110 40 126 40 126 20" stroke="hsl(25 50% 28%)" strokeWidth="3.5" strokeLinecap="round" opacity="0.3"/>
       <path d="M140 70 C140 50 156 50 156 30" stroke="hsl(25 50% 28%)" strokeWidth="3.5" strokeLinecap="round" opacity="0.25"/>
       <path d="M170 60 C170 40 186 40 186 20" stroke="hsl(25 50% 28%)" strokeWidth="3.5" strokeLinecap="round" opacity="0.3"/>
@@ -26,17 +26,17 @@ function CoffeeCupIllustration() {
 }
 
 const steps = [
-  { icon: UserPlus,       num: '01', title: 'Buat Akun',      desc: 'Daftar gratis dalam 30 detik',      color: 'bg-primary text-primary-foreground' },
-  { icon: UtensilsCrossed,num: '02', title: 'Pilih Menu',     desc: 'Jelajahi 50+ pilihan kopi & hidangan', color: 'bg-amber-500 text-white' },
-  { icon: CreditCard,     num: '03', title: 'Checkout',       desc: 'Bayar transfer, e-wallet, atau tunai', color: 'bg-blue-500 text-white' },
-  { icon: PackageCheck,   num: '04', title: 'Ambil & Nikmati', desc: 'Pesanan siap dalam hitungan menit',   color: 'bg-emerald-500 text-white' },
+  { icon: UserPlus,        num: '01', title: 'Buat Akun',       desc: 'Daftar gratis dalam 30 detik',           color: 'bg-primary text-primary-foreground' },
+  { icon: UtensilsCrossed, num: '02', title: 'Pilih Menu',      desc: 'Jelajahi 50+ pilihan kopi & hidangan',   color: 'bg-amber-500 text-white' },
+  { icon: CreditCard,      num: '03', title: 'Checkout',        desc: 'Bayar transfer, e-wallet, atau tunai',   color: 'bg-blue-500 text-white' },
+  { icon: PackageCheck,    num: '04', title: 'Ambil & Nikmati', desc: 'Pesanan siap dalam hitungan menit',      color: 'bg-emerald-500 text-white' },
 ]
 
 const features = [
   {
     icon: Coffee,
     title: 'Kualitas Premium',
-    desc: 'Kopi racikan barista profesional dari biji pilihan dengan cita rasa konsisten',
+    desc: 'Kopi racikan barista profesional dari biji pilihan dengan cita rasa konsisten setiap hari.',
     color: 'bg-amber-50 border-amber-200/70',
     iconBg: 'bg-amber-100',
     iconColor: 'text-amber-700',
@@ -44,7 +44,7 @@ const features = [
   {
     icon: Zap,
     title: 'Layanan Cepat',
-    desc: 'Pesan online, ambil di gerai dalam hitungan menit — tanpa antre panjang',
+    desc: 'Pesan online, ambil di gerai dalam hitungan menit — tanpa antre panjang.',
     color: 'bg-sky-50 border-sky-200/70',
     iconBg: 'bg-sky-100',
     iconColor: 'text-sky-700',
@@ -52,11 +52,18 @@ const features = [
   {
     icon: ShoppingCart,
     title: 'Pemesanan Mudah',
-    desc: 'Checkout cepat dengan pilihan transfer bank, e-wallet, atau bayar di kasir',
+    desc: 'Checkout cepat dengan pilihan transfer bank, e-wallet, atau bayar di kasir.',
     color: 'bg-emerald-50 border-emerald-200/70',
     iconBg: 'bg-emerald-100',
     iconColor: 'text-emerald-700',
   },
+]
+
+const stats = [
+  { value: '50+', label: 'Pilihan Menu' },
+  { value: '5 min', label: 'Waktu Siap' },
+  { value: '3×', label: 'Metode Bayar' },
+  { value: '100%', label: 'Racikan Barista' },
 ]
 
 export default function HomePage() {
@@ -73,7 +80,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="border-b border-primary/10 bg-background/80 backdrop-blur sticky top-0 z-50">
+      <header className="border-b border-primary/10 bg-background/85 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-sm">
@@ -83,14 +90,14 @@ export default function HomePage() {
               Coffee House
             </span>
           </div>
-          <div className="flex gap-2.5">
+          <div className="flex gap-2">
             <Link href="/auth/login">
-              <Button variant="outline" size="sm" className="border-primary/25 text-primary hover:bg-primary/5 font-medium">
+              <Button variant="outline" size="sm" className="border-primary/25 text-primary hover:bg-primary/5 font-medium h-9">
                 Masuk
               </Button>
             </Link>
             <Link href="/auth/sign-up">
-              <Button size="sm" className="bg-primary hover:bg-primary/90 shadow-sm font-medium">
+              <Button size="sm" className="bg-primary hover:bg-primary/90 shadow-sm font-medium h-9">
                 Daftar Gratis
               </Button>
             </Link>
@@ -100,36 +107,38 @@ export default function HomePage() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative overflow-hidden px-4 py-14 md:py-20">
+        <section className="relative overflow-hidden px-4 pt-12 pb-10 md:pt-16 md:pb-14">
+          {/* Background blobs */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-primary/6 to-transparent rounded-full translate-x-1/3 -translate-y-1/4" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-accent/6 to-transparent rounded-full -translate-x-1/3 translate-y-1/4" />
           </div>
 
           <div className="relative max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div className="space-y-6 text-center md:text-left">
+            <div className="grid md:grid-cols-2 gap-6 md:gap-10 items-center">
+              {/* Text content */}
+              <div className="space-y-5 text-center md:text-left order-2 md:order-1">
                 <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-semibold border border-primary/20">
                   <Star className="h-3.5 w-3.5 fill-primary" />
                   Kopi Premium, Layanan Terbaik
                 </div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
                   Nikmati Setiap{' '}
                   <span className="text-primary italic">Tegukan</span>{' '}
                   Bersama Kami
                 </h1>
-                <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-lg mx-auto md:mx-0">
                   Pesan kopi & hidangan favorit Anda secara online. Racikan barista profesional, siap dalam hitungan menit.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                   <Link href="/auth/sign-up">
-                    <Button className="bg-primary hover:bg-primary/90 h-12 px-8 text-base font-semibold shadow-md inline-flex items-center gap-2">
+                    <Button className="bg-primary hover:bg-primary/90 h-12 px-8 text-base font-semibold shadow-md inline-flex items-center gap-2 w-full sm:w-auto press-effect">
                       Mulai Pesan Sekarang
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </Link>
                   <Link href="/auth/login">
-                    <Button variant="outline" className="border-primary/25 h-12 px-8 text-base font-medium text-primary hover:bg-primary/5">
+                    <Button variant="outline" className="border-primary/25 h-12 px-8 text-base font-medium text-primary hover:bg-primary/5 w-full sm:w-auto">
                       Sudah Punya Akun?
                     </Button>
                   </Link>
@@ -139,21 +148,36 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div className="hidden md:flex items-center justify-center">
-                <div className="relative w-72 h-72 lg:w-80 lg:h-80">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/10 to-accent/8 blur-2xl" />
-                  <div className="absolute inset-6 rounded-full bg-gradient-to-br from-primary/8 to-accent/5 border border-primary/10" />
-                  <div className="absolute inset-8">
+              {/* Illustration — visible on all screens, centered on mobile */}
+              <div className="flex items-center justify-center order-1 md:order-2">
+                <div className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/12 to-accent/8 blur-2xl" />
+                  <div className="absolute inset-4 rounded-full bg-gradient-to-br from-primary/8 to-accent/5 border border-primary/10" />
+                  <div className="absolute inset-6">
                     <CoffeeCupIllustration />
                   </div>
-                  <div className="absolute top-4 -right-4 bg-card border border-primary/15 rounded-2xl px-3 py-2 shadow-md">
-                    <p className="text-xs font-bold text-primary">☕ 50+ Menu</p>
+                  <div className="absolute top-2 -right-2 sm:top-4 sm:-right-4 bg-card border border-primary/15 rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-md">
+                    <p className="text-[11px] sm:text-xs font-bold text-primary">☕ 50+ Menu</p>
                   </div>
-                  <div className="absolute bottom-8 -left-6 bg-card border border-primary/15 rounded-2xl px-3 py-2 shadow-md">
-                    <p className="text-xs font-bold text-emerald-600">✓ Siap 5 menit</p>
+                  <div className="absolute bottom-6 -left-4 sm:bottom-8 sm:-left-6 bg-card border border-primary/15 rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2 shadow-md">
+                    <p className="text-[11px] sm:text-xs font-bold text-emerald-600">✓ Siap 5 menit</p>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Stats strip */}
+        <section className="border-y border-primary/10 bg-card/60 backdrop-blur-sm px-4 py-5">
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-0 sm:divide-x sm:divide-primary/10">
+              {stats.map(({ value, label }) => (
+                <div key={label} className="text-center px-4 py-1">
+                  <p className="text-2xl font-bold text-primary" style={{ fontFamily: 'Playfair Display, serif' }}>{value}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 font-medium">{label}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -171,16 +195,15 @@ export default function HomePage() {
               <p className="text-muted-foreground mt-2 text-sm">Dari daftar sampai kopi di tangan — semua dalam hitungan menit</p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-0">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-0">
               {steps.map(({ icon: Icon, num, title, desc, color }, i) => (
                 <div key={num} className="flex md:flex-col items-start md:items-center gap-4 md:gap-0 md:text-center relative">
-                  {/* Connector */}
                   {i < steps.length - 1 && (
                     <div className="hidden md:flex absolute top-6 left-1/2 w-full items-center justify-end pr-3 z-0">
                       <ChevronRight className="h-4 w-4 text-primary/30" />
                     </div>
                   )}
-                  <div className={`relative z-10 w-12 h-12 rounded-2xl ${color} flex items-center justify-center flex-shrink-0 shadow-md md:mx-auto`}>
+                  <div className={`relative z-10 w-12 h-12 rounded-2xl ${color} flex items-center justify-center flex-shrink-0 shadow-md md:mx-auto press-effect`}>
                     <Icon className="h-5 w-5" />
                   </div>
                   <div className="md:mt-4 md:px-4">
@@ -194,7 +217,7 @@ export default function HomePage() {
 
             <div className="mt-10 text-center">
               <Link href="/auth/sign-up">
-                <Button className="bg-primary hover:bg-primary/90 shadow-sm gap-2 px-6">
+                <Button className="bg-primary hover:bg-primary/90 shadow-sm gap-2 px-6 press-effect">
                   Mulai Sekarang — Gratis
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -210,10 +233,11 @@ export default function HomePage() {
               <h2 className="text-2xl md:text-3xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>
                 Kenapa Coffee House?
               </h2>
+              <p className="text-muted-foreground mt-2 text-sm">Kami hadirkan pengalaman kopi terbaik untuk Anda</p>
             </div>
-            <div className="grid md:grid-cols-3 gap-5">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
               {features.map(({ icon: Icon, title, desc, color, iconBg, iconColor }) => (
-                <div key={title} className={`${color} border rounded-2xl p-6 space-y-3 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group`}>
+                <div key={title} className={`${color} border rounded-2xl p-6 space-y-3 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group`}>
                   <div className={`${iconBg} w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200`}>
                     <Icon className={`h-6 w-6 ${iconColor}`} />
                   </div>
@@ -235,8 +259,13 @@ export default function HomePage() {
               <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-x-1/3 -translate-y-1/3 blur-2xl" />
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -translate-x-1/4 translate-y-1/4 blur-2xl" />
+                {/* Decorative coffee bean dots */}
+                <div className="absolute top-8 left-8 w-2 h-2 bg-white/20 rounded-full" />
+                <div className="absolute top-16 left-20 w-1.5 h-1.5 bg-white/15 rounded-full" />
+                <div className="absolute bottom-10 right-10 w-2 h-2 bg-white/20 rounded-full" />
               </div>
               <div className="relative z-10 space-y-4">
+                <p className="text-white/60 text-sm font-semibold uppercase tracking-widest">Bergabung Sekarang</p>
                 <h2 className="text-2xl md:text-3xl font-bold text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
                   Siap Menikmati Kopi Terbaik?
                 </h2>
@@ -245,13 +274,13 @@ export default function HomePage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
                   <Link href="/auth/sign-up">
-                    <Button className="bg-white text-primary hover:bg-white/90 font-semibold px-8 h-11 shadow-lg gap-2">
+                    <Button className="bg-white text-primary hover:bg-white/90 font-semibold px-8 h-12 shadow-lg gap-2 press-effect w-full sm:w-auto">
                       Daftar Gratis Sekarang
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </Link>
                   <Link href="/auth/login">
-                    <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 h-11 px-8">
+                    <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 h-12 px-8 w-full sm:w-auto">
                       Sudah Punya Akun
                     </Button>
                   </Link>
