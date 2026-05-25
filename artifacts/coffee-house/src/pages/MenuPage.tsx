@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import {
   LogOut, ShoppingBag, Clock, CheckCircle, AlertCircle,
-  Eye, RefreshCw, ShoppingCart, Coffee, UtensilsCrossed, ClipboardList,
+  Eye, RefreshCw, ShoppingCart, Coffee, UtensilsCrossed, ClipboardList, Search, X,
 } from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -42,16 +42,25 @@ const paymentStatusConfig: Record<string, { label: string; cls: string }> = {
 }
 
 const orderStatusConfig: Record<string, { label: string; cls: string; icon?: React.ElementType }> = {
-  pending:   { label: 'Antrean',       cls: 'bg-amber-50 border-amber-200 text-amber-800',     icon: Clock },
+  pending:   { label: 'Antrean',       cls: 'bg-amber-50 border-amber-200 text-amber-800',       icon: Clock },
   preparing: { label: 'Sedang Dibuat', cls: 'bg-blue-50 border-blue-200 text-blue-800' },
   ready:     { label: 'Siap Diambil',  cls: 'bg-emerald-50 border-emerald-200 text-emerald-800', icon: CheckCircle },
   completed: { label: 'Selesai',       cls: 'bg-slate-50 border-slate-200 text-slate-700' },
-  cancelled: { label: 'Dibatalkan',    cls: 'bg-rose-50 border-rose-200 text-rose-800',         icon: AlertCircle },
+  cancelled: { label: 'Dibatalkan',    cls: 'bg-rose-50 border-rose-200 text-rose-800',           icon: AlertCircle },
+}
+
+function getTimeGreeting() {
+  const hour = new Date().getHours()
+  if (hour < 11) return 'Selamat pagi'
+  if (hour < 15) return 'Selamat siang'
+  if (hour < 18) return 'Selamat sore'
+  return 'Selamat malam'
 }
 
 export default function MenuPage() {
   const [items, setItems] = useState<MenuItem[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const [isLoadingMenu, setIsLoadingMenu] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [activeTab, setActiveTab] = useState<'menu' | 'orders'>('menu')
@@ -87,10 +96,7 @@ export default function MenuPage() {
     setIsLoadingOrders(true)
     try {
       const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+        .from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
       if (error && isSupabaseConfigured) toast.error('Gagal mengambil riwayat pesanan')
       else if (data) setOrders(data)
     } catch {
@@ -104,7 +110,12 @@ export default function MenuPage() {
   }, [activeTab, user])
 
   const categories = Array.from(new Set(items.map((item) => item.category))).sort()
-  const filteredItems = selectedCategory ? items.filter((item) => item.category === selectedCategory) : items
+  const filteredItems = items.filter((item) => {
+    const matchesCategory = !selectedCategory || item.category === selectedCategory
+    const q = searchQuery.toLowerCase()
+    const matchesSearch = !q || item.name.toLowerCase().includes(q) || item.description?.toLowerCase().includes(q)
+    return matchesCategory && matchesSearch
+  })
   const cartCount = cart.items.reduce((s, i) => s + i.quantity, 0)
   const cartTotal = cart.getTotal()
 
@@ -113,11 +124,13 @@ export default function MenuPage() {
     setLocation('/auth/login')
   }
 
+  const greeting = getTimeGreeting()
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      {/* ── Header ── */}
       <header className="sticky top-0 z-40 border-b border-primary/10 bg-background/95 backdrop-blur-md shadow-sm">
-        <div className="flex items-center px-4 md:px-6 py-3 gap-3">
+        <div className="flex items-center px-4 md:px-6 py-3 gap-3 max-w-7xl mx-auto">
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
               <Coffee className="h-4 w-4 text-primary-foreground" />
@@ -127,18 +140,15 @@ export default function MenuPage() {
             </span>
           </div>
 
-          {/* Desktop: username + logout */}
           {user && (
-            <span className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-muted-foreground bg-primary/6 px-3 py-1.5 rounded-lg border border-primary/12 truncate max-w-[140px]">
-              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full flex-shrink-0" />
-              {user.username}
-            </span>
+            <div className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-muted-foreground bg-primary/6 px-3 py-1.5 rounded-lg border border-primary/12 truncate max-w-[160px]">
+              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full flex-shrink-0 animate-pulse" />
+              <span className="truncate">{greeting}, <span className="font-bold text-primary">{user.username}</span></span>
+            </div>
           )}
 
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
+            variant="ghost" size="sm" onClick={handleLogout}
             className="text-muted-foreground hover:text-red-500 hover:bg-red-50 h-8 px-2 rounded-lg text-xs gap-1.5 flex-shrink-0"
           >
             <LogOut className="h-3.5 w-3.5" />
@@ -147,7 +157,7 @@ export default function MenuPage() {
         </div>
       </header>
 
-      {/* Desktop tab bar */}
+      {/* ── Desktop tab bar ── */}
       <div className="hidden lg:block border-b border-primary/10 bg-background sticky top-[57px] z-30">
         <div className="flex max-w-7xl mx-auto px-6">
           {(['menu', 'orders'] as const).map((tab) => (
@@ -162,45 +172,86 @@ export default function MenuPage() {
             >
               {tab === 'menu'
                 ? <><UtensilsCrossed className="h-3.5 w-3.5" />Daftar Menu</>
-                : <><ClipboardList className="h-3.5 w-3.5" />Pesanan Saya</>
+                : <><ClipboardList className="h-3.5 w-3.5" />Pesanan Saya
+                  {orders.length > 0 && (
+                    <span className="ml-1 bg-primary text-primary-foreground text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                      {orders.length}
+                    </span>
+                  )}
+                </>
               }
             </button>
           ))}
         </div>
       </div>
 
-      {/* Mobile page title bar */}
+      {/* ── Mobile greeting banner ── */}
       <div
-        className="lg:hidden px-4 py-3 border-b border-primary/10"
-        style={{ background: 'linear-gradient(90deg, hsl(25 50% 28% / 0.06) 0%, hsl(35 80% 95%) 100%)' }}
+        className="lg:hidden border-b border-primary/8"
+        style={{ background: 'linear-gradient(100deg, hsl(35 85% 95%) 0%, hsl(30 55% 97%) 60%, hsl(25 35% 98%) 100%)' }}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeTab === 'menu' ? 'bg-primary' : 'bg-blue-500'}`}>
-              {activeTab === 'menu'
-                ? <UtensilsCrossed className="h-3.5 w-3.5 text-white" />
-                : <ClipboardList className="h-3.5 w-3.5 text-white" />
-              }
-            </div>
-            <h2 className="text-sm font-bold text-foreground">
-              {activeTab === 'menu' ? 'Daftar Menu' : 'Pesanan Saya'}
-            </h2>
+        <div className="px-4 py-3 flex items-center justify-between">
+          <div className="min-w-0">
+            <p className="text-[11px] text-muted-foreground font-medium">{greeting}! 👋</p>
+            <p className="text-sm font-bold text-primary truncate" style={{ fontFamily: 'Playfair Display, serif' }}>
+              {user ? user.username : 'Pelanggan'}{activeTab === 'menu' ? ' — mau pesan apa?' : ' — pesanan kamu'}
+            </p>
           </div>
-          {user && (
-            <div className="flex items-center gap-1.5 bg-white/60 border border-primary/10 rounded-full px-2.5 py-1">
-              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
-              <span className="text-xs font-medium text-foreground/70">{user.username}</span>
-            </div>
-          )}
+          {/* Mobile tab switcher pills */}
+          <div className="flex gap-1 flex-shrink-0 ml-3">
+            <button
+              onClick={() => setActiveTab('menu')}
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
+                activeTab === 'menu' ? 'bg-primary text-white shadow-sm' : 'bg-black/5 text-foreground/60 hover:bg-black/8'
+              }`}
+            >
+              <UtensilsCrossed className="h-3 w-3" />
+              Menu
+            </button>
+            <button
+              onClick={() => setActiveTab('orders')}
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all relative ${
+                activeTab === 'orders' ? 'bg-primary text-white shadow-sm' : 'bg-black/5 text-foreground/60 hover:bg-black/8'
+              }`}
+            >
+              <ClipboardList className="h-3 w-3" />
+              Pesanan
+              {orders.length > 0 && activeTab !== 'orders' && (
+                <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                  {orders.length}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Main content */}
+      {/* ── Main content ── */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 pb-24 lg:pb-6">
         {activeTab === 'menu' ? (
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="flex-1 min-w-0">
-              {/* Category filter */}
+              {/* Search bar */}
+              <div className="relative mb-3">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Cari menu favoritmu..."
+                  className="w-full bg-card border border-primary/15 rounded-xl py-2.5 pl-9 pr-9 text-sm focus:outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-muted-foreground/60 shadow-sm"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0.5 rounded"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Category filter pills */}
               <div className="mb-4">
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
                   <button
@@ -240,7 +291,7 @@ export default function MenuPage() {
                   className="rounded-3xl mt-2 overflow-hidden border border-primary/10 shadow-sm"
                   style={{ background: 'linear-gradient(160deg, hsl(35 80% 97%) 0%, hsl(25 50% 96%) 100%)' }}
                 >
-                  <div className="px-6 py-12 text-center space-y-3">
+                  <div className="px-6 py-14 text-center space-y-3">
                     <div className="relative w-20 h-20 mx-auto">
                       <div className="absolute inset-0 rounded-full bg-primary/8 animate-pulse" />
                       <div className="relative flex items-center justify-center h-full">
@@ -259,11 +310,16 @@ export default function MenuPage() {
               ) : filteredItems.length === 0 ? (
                 <div className="text-center py-16 border border-dashed border-primary/20 rounded-2xl bg-card/50 mt-2">
                   <div className="w-14 h-14 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto mb-3">
-                    <Coffee className="h-6 w-6 text-primary/30" />
+                    <Search className="h-6 w-6 text-primary/30" />
                   </div>
-                  <p className="font-medium text-foreground/60 text-sm">Tidak ada menu di kategori ini.</p>
-                  <button onClick={() => setSelectedCategory(null)} className="text-xs text-primary hover:underline mt-2 inline-block">
-                    Lihat semua menu →
+                  <p className="font-medium text-foreground/60 text-sm">
+                    {searchQuery ? `Tidak ada menu "${searchQuery}"` : 'Tidak ada menu di kategori ini.'}
+                  </p>
+                  <button
+                    onClick={() => { setSearchQuery(''); setSelectedCategory(null) }}
+                    className="text-xs text-primary hover:underline mt-2 inline-block"
+                  >
+                    Reset pencarian →
                   </button>
                 </div>
               ) : (
@@ -277,7 +333,7 @@ export default function MenuPage() {
             </div>
           </div>
         ) : (
-          /* Orders tab — desktop */
+          /* Orders tab */
           <div className="space-y-4 max-w-2xl">
             <div className="flex justify-between items-center">
               <div>
@@ -299,17 +355,23 @@ export default function MenuPage() {
                 ))}
               </div>
             ) : orders.length === 0 ? (
-              <div className="bg-card border border-primary/10 rounded-2xl p-10 text-center space-y-4 shadow-sm">
-                <div className="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto">
-                  <ShoppingBag className="h-7 w-7 text-primary/30" />
+              <div
+                className="rounded-3xl overflow-hidden border border-primary/10 shadow-sm"
+                style={{ background: 'linear-gradient(160deg, hsl(35 80% 97%) 0%, hsl(25 50% 96%) 100%)' }}
+              >
+                <div className="p-10 text-center space-y-4">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto">
+                    <ShoppingBag className="h-7 w-7 text-primary/30" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-foreground/70">Belum ada pesanan</p>
+                    <p className="text-sm text-muted-foreground mt-1">Yuk, mulai pesan kopi favoritmu!</p>
+                  </div>
+                  <Button onClick={() => setActiveTab('menu')} className="bg-primary hover:bg-primary/90 shadow-sm rounded-xl gap-2">
+                    <UtensilsCrossed className="h-4 w-4" />
+                    Lihat Menu
+                  </Button>
                 </div>
-                <div>
-                  <p className="font-medium text-foreground/70">Belum ada pesanan</p>
-                  <p className="text-sm text-muted-foreground mt-1">Yuk, mulai pesan kopi favoritmu!</p>
-                </div>
-                <Button onClick={() => setActiveTab('menu')} className="bg-primary hover:bg-primary/90 shadow-sm rounded-xl">
-                  Pesan Sekarang
-                </Button>
               </div>
             ) : (
               <div className="space-y-3">
@@ -359,10 +421,10 @@ export default function MenuPage() {
         )}
       </div>
 
-      {/* ─── MOBILE BOTTOM NAVIGATION ─── */}
+      {/* ── Mobile Bottom Navigation ── */}
       <Sheet open={cartSheetOpen} onOpenChange={setCartSheetOpen}>
         <div
-          className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-primary/12 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+          className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/96 backdrop-blur-md border-t border-primary/12 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="flex items-stretch h-16">
@@ -388,13 +450,13 @@ export default function MenuPage() {
                 <div className="relative p-1.5">
                   <ShoppingCart className="h-5 w-5" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 bg-accent text-accent-foreground text-[9px] min-w-[16px] h-[16px] rounded-full flex items-center justify-center font-bold px-0.5 leading-none">
+                    <span className="absolute -top-0.5 -right-0.5 bg-accent text-accent-foreground text-[9px] min-w-[16px] h-[16px] rounded-full flex items-center justify-center font-bold px-0.5 leading-none shadow-sm">
                       {cartCount > 9 ? '9+' : cartCount}
                     </span>
                   )}
                 </div>
                 <span className="text-[10px] font-semibold leading-none">
-                  {cartCount > 0 ? formatRupiah(cart.getTotal()).replace('Rp', '') : 'Keranjang'}
+                  {cartCount > 0 ? formatRupiah(cartTotal).replace('Rp\u00a0', '') : 'Keranjang'}
                 </span>
               </button>
             </SheetTrigger>
@@ -422,9 +484,9 @@ export default function MenuPage() {
           </div>
         </div>
 
-        {/* Cart sheet content */}
+        {/* Cart Sheet */}
         <SheetContent side="right" className="w-full sm:w-96 p-0 flex flex-col">
-          <SheetHeader className="px-5 py-4 border-b border-primary/10 flex-shrink-0">
+          <SheetHeader className="px-5 py-4 border-b border-primary/10 flex-shrink-0 bg-gradient-to-r from-primary/8 to-accent/6">
             <SheetTitle className="flex items-center gap-2 text-base">
               <ShoppingCart className="h-4 w-4 text-primary" />
               Keranjang Belanja

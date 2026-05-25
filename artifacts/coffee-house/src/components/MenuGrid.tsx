@@ -61,7 +61,7 @@ export default function MenuGrid({ items }: MenuGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+    <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
       {items.map((item) => {
         const style = getCategoryStyle(item.category)
         const PlaceholderIcon = style.icon
