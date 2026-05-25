@@ -170,18 +170,27 @@ export default function MenuPage() {
       </div>
 
       {/* Mobile page title bar */}
-      <div className="lg:hidden px-4 py-2.5 border-b border-primary/8 bg-background/80">
+      <div
+        className="lg:hidden px-4 py-3 border-b border-primary/10"
+        style={{ background: 'linear-gradient(90deg, hsl(25 50% 28% / 0.06) 0%, hsl(35 80% 95%) 100%)' }}
+      >
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-bold text-primary uppercase tracking-wide flex items-center gap-1.5">
-            {activeTab === 'menu'
-              ? <><UtensilsCrossed className="h-3 w-3" />Daftar Menu</>
-              : <><ClipboardList className="h-3 w-3" />Pesanan Saya</>
-            }
-          </h2>
+          <div className="flex items-center gap-2">
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeTab === 'menu' ? 'bg-primary' : 'bg-blue-500'}`}>
+              {activeTab === 'menu'
+                ? <UtensilsCrossed className="h-3.5 w-3.5 text-white" />
+                : <ClipboardList className="h-3.5 w-3.5 text-white" />
+              }
+            </div>
+            <h2 className="text-sm font-bold text-foreground">
+              {activeTab === 'menu' ? 'Daftar Menu' : 'Pesanan Saya'}
+            </h2>
+          </div>
           {user && (
-            <span className="text-xs text-muted-foreground">
-              Hi, <strong className="text-foreground">{user.username}</strong>
-            </span>
+            <div className="flex items-center gap-1.5 bg-white/60 border border-primary/10 rounded-full px-2.5 py-1">
+              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+              <span className="text-xs font-medium text-foreground/70">{user.username}</span>
+            </div>
           )}
         </div>
       </div>
@@ -227,12 +236,25 @@ export default function MenuPage() {
                   ))}
                 </div>
               ) : items.length === 0 ? (
-                <div className="text-center py-16 border border-dashed border-primary/20 rounded-2xl bg-card/50 mt-2">
-                  <div className="w-14 h-14 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto mb-3">
-                    <ShoppingBag className="h-6 w-6 text-primary/30" />
+                <div
+                  className="rounded-3xl mt-2 overflow-hidden border border-primary/10 shadow-sm"
+                  style={{ background: 'linear-gradient(160deg, hsl(35 80% 97%) 0%, hsl(25 50% 96%) 100%)' }}
+                >
+                  <div className="px-6 py-12 text-center space-y-3">
+                    <div className="relative w-20 h-20 mx-auto">
+                      <div className="absolute inset-0 rounded-full bg-primary/8 animate-pulse" />
+                      <div className="relative flex items-center justify-center h-full">
+                        <Coffee className="h-9 w-9 text-primary/30" />
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-foreground/70 text-base">Menu belum tersedia</h3>
+                      <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                        Kami sedang mempersiapkan menu terbaik untuk Anda.
+                      </p>
+                      <p className="text-xs text-muted-foreground/60 mt-1.5">Silakan coba lagi nanti ☕</p>
+                    </div>
                   </div>
-                  <p className="font-medium text-foreground/60 text-sm">Tidak ada menu yang tersedia.</p>
-                  <p className="text-xs text-muted-foreground mt-1">Silakan coba lagi nanti.</p>
                 </div>
               ) : filteredItems.length === 0 ? (
                 <div className="text-center py-16 border border-dashed border-primary/20 rounded-2xl bg-card/50 mt-2">
