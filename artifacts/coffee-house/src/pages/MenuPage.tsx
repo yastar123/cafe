@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import {
   LogOut, ShoppingBag, Clock, CheckCircle, AlertCircle,
-  Eye, RefreshCw, ShoppingCart, Coffee,
+  Eye, RefreshCw, ShoppingCart, Coffee, UtensilsCrossed, ClipboardList,
 } from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -184,7 +184,12 @@ export default function MenuPage() {
                   : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
-              {tab === 'menu' ? 'Daftar Menu' : 'Pesanan Saya'}
+              <span className="inline-flex items-center gap-1.5">
+              {tab === 'menu'
+                ? <><UtensilsCrossed className="h-3.5 w-3.5" />Daftar Menu</>
+                : <><ClipboardList className="h-3.5 w-3.5" />Pesanan Saya</>
+              }
+            </span>
               {tab === 'orders' && orders.length > 0 && activeTab !== 'orders' && (
                 <span className="ml-1.5 text-[10px] bg-primary/15 text-primary px-1.5 py-0.5 rounded-full font-bold">
                   {orders.length}
