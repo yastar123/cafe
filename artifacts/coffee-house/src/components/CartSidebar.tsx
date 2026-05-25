@@ -1,7 +1,7 @@
 import { useCart, type CartItem } from '@/lib/store/cart'
 import { Button } from '@/components/ui/button'
 import { useLocation } from 'wouter'
-import { Trash2, Minus, Plus, ShoppingBag, ArrowRight, Coffee } from 'lucide-react'
+import { Trash2, Minus, Plus, ShoppingBag, ArrowRight, Coffee, PackageCheck } from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 
 interface CartSidebarProps {
@@ -19,6 +19,7 @@ export default function CartSidebar({ cartItems, onNavigate, inSheet }: CartSide
   const total = getTotal()
   const tax = total * 0.05
   const finalTotal = total + tax
+  const itemCount = cartItems.reduce((s, i) => s + i.quantity, 0)
 
   const handleCheckout = () => {
     onNavigate?.()
@@ -27,19 +28,19 @@ export default function CartSidebar({ cartItems, onNavigate, inSheet }: CartSide
 
   const wrapperCls = inSheet
     ? 'flex flex-col h-full'
-    : 'bg-card border border-primary/12 rounded-2xl shadow-md lg:sticky lg:top-24 flex flex-col overflow-hidden'
+    : 'bg-card border border-primary/12 rounded-2xl shadow-md lg:sticky lg:top-24 flex flex-col overflow-hidden max-h-[calc(100vh-7rem)]'
 
   return (
     <div className={wrapperCls}>
-      {/* Header — only shown outside sheet (sheet has its own SheetHeader) */}
+      {/* Header — only for non-sheet */}
       {!inSheet && (
-        <div className="bg-gradient-to-r from-primary/10 to-accent/8 px-4 py-3.5 flex-shrink-0 border-b border-primary/10">
-          <h2 className="font-semibold text-foreground text-sm flex items-center gap-2">
+        <div className="bg-gradient-to-r from-primary/10 to-accent/7 px-4 py-3.5 flex-shrink-0 border-b border-primary/10">
+          <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
             <ShoppingBag className="h-4 w-4 text-primary" />
             Keranjang Belanja
             {cartItems.length > 0 && (
-              <span className="ml-auto bg-primary text-primary-foreground text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                {cartItems.reduce((s, i) => s + i.quantity, 0)}
+              <span className="ml-auto bg-primary text-primary-foreground text-xs font-black w-5 h-5 rounded-full flex items-center justify-center">
+                {itemCount}
               </span>
             )}
           </h2>
@@ -48,11 +49,11 @@ export default function CartSidebar({ cartItems, onNavigate, inSheet }: CartSide
 
       {cartItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 px-4 text-center flex-1">
-          <div className="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center mb-3">
-            <ShoppingBag className="h-7 w-7 text-primary/30" />
+          <div className="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center mb-4">
+            <ShoppingBag className="h-7 w-7 text-primary/25" />
           </div>
-          <p className="text-sm font-semibold text-foreground/60">Keranjang kosong</p>
-          <p className="text-xs text-muted-foreground mt-1">Tambah menu favoritmu untuk mulai pesan</p>
+          <p className="text-sm font-bold text-foreground/55">Keranjang kosong</p>
+          <p className="text-xs text-muted-foreground mt-1.5 max-w-[180px] leading-relaxed">Tambah menu favoritmu untuk mulai pesan</p>
         </div>
       ) : (
         <div className="flex flex-col flex-1 overflow-hidden">
@@ -64,7 +65,7 @@ export default function CartSidebar({ cartItems, onNavigate, inSheet }: CartSide
                 className={`flex items-start gap-3 py-3 ${idx < cartItems.length - 1 ? 'border-b border-primary/8' : ''}`}
               >
                 {/* Thumbnail */}
-                <div className="w-11 h-11 rounded-xl flex-shrink-0 overflow-hidden mt-0.5">
+                <div className="w-11 h-11 rounded-xl flex-shrink-0 overflow-hidden mt-0.5 shadow-sm">
                   {item.image_url ? (
                     <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
                   ) : (
@@ -77,7 +78,7 @@ export default function CartSidebar({ cartItems, onNavigate, inSheet }: CartSide
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-foreground truncate leading-snug">{item.name}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{formatRupiah(item.price)}/item</p>
-                  {/* Controls row */}
+                  {/* Controls */}
                   <div className="flex items-center gap-1.5 mt-2">
                     <button
                       onClick={() => updateQuantity(item.menuItemId, item.quantity - 1)}
@@ -85,7 +86,7 @@ export default function CartSidebar({ cartItems, onNavigate, inSheet }: CartSide
                     >
                       <Minus className="h-3 w-3 text-primary" />
                     </button>
-                    <span className="w-6 text-center text-sm font-bold">{item.quantity}</span>
+                    <span className="w-6 text-center text-sm font-bold tabular-nums">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.menuItemId, item.quantity + 1)}
                       className="w-7 h-7 border border-primary/20 hover:bg-primary/10 rounded-lg flex items-center justify-center transition-colors press-effect"
@@ -111,15 +112,18 @@ export default function CartSidebar({ cartItems, onNavigate, inSheet }: CartSide
           {/* Totals + CTA */}
           <div className="px-4 pb-4 pt-3 border-t border-primary/10 space-y-2 flex-shrink-0 bg-card">
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Subtotal</span>
-              <span className="font-medium text-foreground">{formatRupiah(total)}</span>
+              <span>Subtotal ({itemCount} item)</span>
+              <span className="font-semibold text-foreground">{formatRupiah(total)}</span>
             </div>
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>PPN (5%)</span>
-              <span className="font-medium text-foreground">{formatRupiah(tax)}</span>
+              <span className="font-semibold text-foreground">{formatRupiah(tax)}</span>
             </div>
-            <div className="flex justify-between text-sm font-bold pt-2 border-t border-primary/10">
-              <span>Total</span>
+            <div className="flex justify-between text-sm font-bold pt-2.5 border-t border-primary/10 items-center">
+              <span className="flex items-center gap-1.5">
+                <PackageCheck className="h-3.5 w-3.5 text-primary/50" />
+                Total
+              </span>
               <span className="text-primary text-base">{formatRupiah(finalTotal)}</span>
             </div>
 

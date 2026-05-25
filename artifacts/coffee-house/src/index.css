@@ -220,7 +220,6 @@
     border-radius: calc(var(--radius) - 2px);
   }
 
-  /* Smooth scrollbar */
   * {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--primary) / 0.2) transparent;
@@ -239,6 +238,38 @@
   *::-webkit-scrollbar-thumb:hover {
     background-color: hsl(var(--primary) / 0.35);
   }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
 }
 
 @layer utilities {
@@ -311,14 +342,12 @@
     inset: -1px;
   }
 
-  /* Glass morphism utility */
   .glass {
     background: hsl(var(--card) / 0.75);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
 
-  /* Scrollbar hidden utility */
   .scrollbar-none {
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -327,7 +356,6 @@
     display: none;
   }
 
-  /* Safe-area inset padding (notched iPhones / Android) */
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
@@ -335,11 +363,33 @@
     padding-top: env(safe-area-inset-top, 0px);
   }
 
-  /* Smooth press animation for interactive elements */
   .press-effect {
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
   }
   .press-effect:active {
-    transform: scale(0.97);
+    transform: scale(0.96);
   }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease both;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.4s ease both;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.35s ease both;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .delay-100 { animation-delay: 100ms; }
+  .delay-150 { animation-delay: 150ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
+  .delay-500 { animation-delay: 500ms; }
 }

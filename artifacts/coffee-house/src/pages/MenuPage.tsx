@@ -125,12 +125,14 @@ export default function MenuPage() {
   }
 
   const greeting = getTimeGreeting()
+  const userInitial = user?.username?.charAt(0)?.toUpperCase() ?? '?'
 
   return (
     <div className="min-h-screen bg-background">
       {/* ── Header ── */}
-      <header className="sticky top-0 z-40 border-b border-primary/10 bg-background/95 backdrop-blur-md shadow-sm">
+      <header className="sticky top-0 z-40 border-b border-primary/10 bg-background/96 backdrop-blur-md shadow-sm">
         <div className="flex items-center px-4 md:px-6 py-3 gap-3 max-w-7xl mx-auto">
+          {/* Logo */}
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
               <Coffee className="h-4 w-4 text-primary-foreground" />
@@ -140,16 +142,19 @@ export default function MenuPage() {
             </span>
           </div>
 
+          {/* Greeting pill — desktop */}
           {user && (
-            <div className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-muted-foreground bg-primary/6 px-3 py-1.5 rounded-lg border border-primary/12 truncate max-w-[160px]">
-              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full flex-shrink-0 animate-pulse" />
+            <div className="hidden sm:flex items-center gap-2 text-xs font-medium text-muted-foreground bg-primary/6 px-3 py-1.5 rounded-xl border border-primary/12 max-w-[180px]">
+              <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                <span className="text-[9px] font-black text-primary-foreground">{userInitial}</span>
+              </div>
               <span className="truncate">{greeting}, <span className="font-bold text-primary">{user.username}</span></span>
             </div>
           )}
 
           <Button
             variant="ghost" size="sm" onClick={handleLogout}
-            className="text-muted-foreground hover:text-red-500 hover:bg-red-50 h-8 px-2 rounded-lg text-xs gap-1.5 flex-shrink-0"
+            className="text-muted-foreground hover:text-red-500 hover:bg-red-50 h-8 px-2 rounded-lg text-xs gap-1.5 flex-shrink-0 transition-colors duration-200"
           >
             <LogOut className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Keluar</span>
@@ -164,7 +169,7 @@ export default function MenuPage() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`py-3.5 px-4 text-sm font-semibold border-b-2 transition-all flex items-center gap-1.5 ${
+              className={`py-3.5 px-5 text-sm font-semibold border-b-2 transition-all flex items-center gap-1.5 ${
                 activeTab === tab
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-foreground hover:border-primary/20'
@@ -174,7 +179,7 @@ export default function MenuPage() {
                 ? <><UtensilsCrossed className="h-3.5 w-3.5" />Daftar Menu</>
                 : <><ClipboardList className="h-3.5 w-3.5" />Pesanan Saya
                   {orders.length > 0 && (
-                    <span className="ml-1 bg-primary text-primary-foreground text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                    <span className="ml-1 bg-primary text-primary-foreground text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
                       {orders.length}
                     </span>
                   )}
@@ -188,21 +193,28 @@ export default function MenuPage() {
       {/* ── Mobile greeting banner ── */}
       <div
         className="lg:hidden border-b border-primary/8"
-        style={{ background: 'linear-gradient(100deg, hsl(35 85% 95%) 0%, hsl(30 55% 97%) 60%, hsl(25 35% 98%) 100%)' }}
+        style={{ background: 'linear-gradient(100deg, hsl(35 88% 95%) 0%, hsl(30 58% 97%) 60%, hsl(25 38% 98%) 100%)' }}
       >
-        <div className="px-4 py-3 flex items-center justify-between">
-          <div className="min-w-0">
-            <p className="text-[11px] text-muted-foreground font-medium">{greeting}! 👋</p>
+        <div className="px-4 py-3 flex items-center gap-3">
+          {/* Avatar */}
+          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center flex-shrink-0 shadow-sm">
+            <span className="text-sm font-black text-primary-foreground">{userInitial}</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] text-muted-foreground font-medium">{greeting}! 👋</p>
             <p className="text-sm font-bold text-primary truncate" style={{ fontFamily: 'Playfair Display, serif' }}>
-              {user ? user.username : 'Pelanggan'}{activeTab === 'menu' ? ' — mau pesan apa?' : ' — pesanan kamu'}
+              {user ? user.username : 'Pelanggan'}
+              <span className="font-normal text-muted-foreground">
+                {activeTab === 'menu' ? ' — mau pesan apa?' : ' — pesananmu'}
+              </span>
             </p>
           </div>
-          {/* Mobile tab switcher pills */}
-          <div className="flex gap-1 flex-shrink-0 ml-3">
+          {/* Tab switcher pills */}
+          <div className="flex gap-1 flex-shrink-0">
             <button
               onClick={() => setActiveTab('menu')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
-                activeTab === 'menu' ? 'bg-primary text-white shadow-sm' : 'bg-black/5 text-foreground/60 hover:bg-black/8'
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
+                activeTab === 'menu' ? 'bg-primary text-white shadow-sm' : 'bg-black/6 text-foreground/60 hover:bg-black/10'
               }`}
             >
               <UtensilsCrossed className="h-3 w-3" />
@@ -210,14 +222,14 @@ export default function MenuPage() {
             </button>
             <button
               onClick={() => setActiveTab('orders')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all relative ${
-                activeTab === 'orders' ? 'bg-primary text-white shadow-sm' : 'bg-black/5 text-foreground/60 hover:bg-black/8'
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all relative ${
+                activeTab === 'orders' ? 'bg-primary text-white shadow-sm' : 'bg-black/6 text-foreground/60 hover:bg-black/10'
               }`}
             >
               <ClipboardList className="h-3 w-3" />
               Pesanan
               {orders.length > 0 && activeTab !== 'orders' && (
-                <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center">
                   {orders.length}
                 </span>
               )}
@@ -227,7 +239,7 @@ export default function MenuPage() {
       </div>
 
       {/* ── Main content ── */}
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 pb-24 lg:pb-6">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 pb-24 lg:pb-8">
         {activeTab === 'menu' ? (
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="flex-1 min-w-0">
@@ -244,7 +256,7 @@ export default function MenuPage() {
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0.5 rounded"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0.5 rounded-md hover:bg-primary/8"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -253,13 +265,13 @@ export default function MenuPage() {
 
               {/* Category filter pills */}
               <div className="mb-4">
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
+                <div className="flex gap-2 overflow-x-auto pb-1.5 scrollbar-none -mx-1 px-1">
                   <button
                     onClick={() => setSelectedCategory(null)}
-                    className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+                    className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold transition-all border ${
                       selectedCategory === null
-                        ? 'bg-primary text-white border-primary shadow-sm'
-                        : 'bg-card text-foreground border-primary/15 hover:border-primary/30 hover:bg-primary/5'
+                        ? 'bg-primary text-white border-primary shadow-sm shadow-primary/20'
+                        : 'bg-card text-foreground/70 border-primary/15 hover:border-primary/30 hover:bg-primary/5'
                     }`}
                   >
                     Semua
@@ -268,10 +280,10 @@ export default function MenuPage() {
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
-                      className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+                      className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold transition-all border capitalize ${
                         selectedCategory === cat
-                          ? 'bg-primary text-white border-primary shadow-sm'
-                          : 'bg-card text-foreground border-primary/15 hover:border-primary/30 hover:bg-primary/5'
+                          ? 'bg-primary text-white border-primary shadow-sm shadow-primary/20'
+                          : 'bg-card text-foreground/70 border-primary/15 hover:border-primary/30 hover:bg-primary/5'
                       }`}
                     >
                       {cat}
@@ -281,9 +293,9 @@ export default function MenuPage() {
               </div>
 
               {isLoadingMenu ? (
-                <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                   {[...Array(6)].map((_, i) => (
-                    <div key={i} className="h-56 rounded-2xl bg-primary/5 animate-pulse" />
+                    <div key={i} className="rounded-2xl bg-primary/6 animate-pulse" style={{ aspectRatio: '3/4' }} />
                   ))}
                 </div>
               ) : items.length === 0 ? (
@@ -291,7 +303,7 @@ export default function MenuPage() {
                   className="rounded-3xl mt-2 overflow-hidden border border-primary/10 shadow-sm"
                   style={{ background: 'linear-gradient(160deg, hsl(35 80% 97%) 0%, hsl(25 50% 96%) 100%)' }}
                 >
-                  <div className="px-6 py-14 text-center space-y-3">
+                  <div className="px-6 py-16 text-center space-y-4">
                     <div className="relative w-20 h-20 mx-auto">
                       <div className="absolute inset-0 rounded-full bg-primary/8 animate-pulse" />
                       <div className="relative flex items-center justify-center h-full">
@@ -308,16 +320,16 @@ export default function MenuPage() {
                   </div>
                 </div>
               ) : filteredItems.length === 0 ? (
-                <div className="text-center py-16 border border-dashed border-primary/20 rounded-2xl bg-card/50 mt-2">
+                <div className="text-center py-16 border-2 border-dashed border-primary/15 rounded-2xl bg-card/60 mt-2">
                   <div className="w-14 h-14 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto mb-3">
                     <Search className="h-6 w-6 text-primary/30" />
                   </div>
-                  <p className="font-medium text-foreground/60 text-sm">
+                  <p className="font-semibold text-foreground/60 text-sm">
                     {searchQuery ? `Tidak ada menu "${searchQuery}"` : 'Tidak ada menu di kategori ini.'}
                   </p>
                   <button
                     onClick={() => { setSearchQuery(''); setSelectedCategory(null) }}
-                    className="text-xs text-primary hover:underline mt-2 inline-block"
+                    className="text-xs text-primary hover:underline mt-2 inline-block font-medium"
                   >
                     Reset pencarian →
                   </button>
@@ -328,7 +340,7 @@ export default function MenuPage() {
             </div>
 
             {/* Desktop cart sidebar */}
-            <div className="hidden lg:block w-72 flex-shrink-0">
+            <div className="hidden lg:block w-[280px] xl:w-[300px] flex-shrink-0">
               <CartSidebar cartItems={cart.items} />
             </div>
           </div>
@@ -342,7 +354,7 @@ export default function MenuPage() {
                 </h2>
                 <p className="text-sm text-muted-foreground">Pantau status pesanan aktif Anda</p>
               </div>
-              <Button size="sm" variant="outline" onClick={fetchOrders} className="border-primary/15 gap-1.5 h-9 text-xs rounded-xl">
+              <Button size="sm" variant="outline" onClick={fetchOrders} className="border-primary/15 gap-1.5 h-9 text-xs rounded-xl hover:bg-primary/5">
                 <RefreshCw className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Segarkan</span>
               </Button>
@@ -359,7 +371,7 @@ export default function MenuPage() {
                 className="rounded-3xl overflow-hidden border border-primary/10 shadow-sm"
                 style={{ background: 'linear-gradient(160deg, hsl(35 80% 97%) 0%, hsl(25 50% 96%) 100%)' }}
               >
-                <div className="p-10 text-center space-y-4">
+                <div className="p-12 text-center space-y-4">
                   <div className="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto">
                     <ShoppingBag className="h-7 w-7 text-primary/30" />
                   </div>
@@ -381,7 +393,7 @@ export default function MenuPage() {
                   const OIcon = oCfg.icon
                   return (
                     <div key={order.id} className="bg-card border border-primary/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200">
-                      <div className="bg-gradient-to-r from-primary/6 to-accent/5 px-4 py-3 flex items-center justify-between border-b border-primary/8">
+                      <div className="bg-gradient-to-r from-primary/6 to-accent/4 px-4 py-3 flex items-center justify-between border-b border-primary/8">
                         <div>
                           <p className="text-xs font-bold text-primary">#{order.id.slice(0, 8).toUpperCase()}</p>
                           <p className="text-xs text-muted-foreground mt-0.5">
@@ -393,11 +405,11 @@ export default function MenuPage() {
                       <div className="px-4 py-3 flex flex-wrap items-center justify-between gap-3">
                         <div className="flex flex-wrap gap-3">
                           <div>
-                            <p className="text-[10px] text-muted-foreground mb-1 font-medium uppercase tracking-wide">Pembayaran</p>
+                            <p className="text-[10px] text-muted-foreground mb-1 font-semibold uppercase tracking-wide">Pembayaran</p>
                             <span className={`text-xs px-2.5 py-0.5 rounded-full border font-semibold ${pCfg.cls}`}>{pCfg.label}</span>
                           </div>
                           <div>
-                            <p className="text-[10px] text-muted-foreground mb-1 font-medium uppercase tracking-wide">Status</p>
+                            <p className="text-[10px] text-muted-foreground mb-1 font-semibold uppercase tracking-wide">Status</p>
                             <span className={`text-xs px-2.5 py-0.5 rounded-full border font-semibold inline-flex items-center gap-1 ${oCfg.cls}`}>
                               {OIcon && <OIcon className="h-3 w-3" />}
                               {oCfg.label}
@@ -424,14 +436,14 @@ export default function MenuPage() {
       {/* ── Mobile Bottom Navigation ── */}
       <Sheet open={cartSheetOpen} onOpenChange={setCartSheetOpen}>
         <div
-          className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/96 backdrop-blur-md border-t border-primary/12 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+          className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/97 backdrop-blur-lg border-t border-primary/12 shadow-[0_-4px_24px_rgba(0,0,0,0.09)]"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <div className="flex items-stretch h-16">
             {/* Menu tab */}
             <button
               onClick={() => setActiveTab('menu')}
-              className={`flex-1 flex flex-col items-center justify-center gap-0.5 relative transition-colors ${
+              className={`flex-1 flex flex-col items-center justify-center gap-0.5 relative transition-colors duration-150 ${
                 activeTab === 'menu' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -441,7 +453,7 @@ export default function MenuPage() {
               <div className={`p-1.5 rounded-xl transition-colors ${activeTab === 'menu' ? 'bg-primary/10' : ''}`}>
                 <UtensilsCrossed className="h-5 w-5" />
               </div>
-              <span className="text-[10px] font-semibold leading-none">Menu</span>
+              <span className="text-[10px] font-bold leading-none">Menu</span>
             </button>
 
             {/* Cart tab — opens sheet */}
@@ -450,12 +462,12 @@ export default function MenuPage() {
                 <div className="relative p-1.5">
                   <ShoppingCart className="h-5 w-5" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 bg-accent text-accent-foreground text-[9px] min-w-[16px] h-[16px] rounded-full flex items-center justify-center font-bold px-0.5 leading-none shadow-sm">
+                    <span className="absolute -top-0.5 -right-0.5 bg-accent text-accent-foreground text-[9px] min-w-[16px] h-[16px] rounded-full flex items-center justify-center font-black px-0.5 leading-none shadow-sm">
                       {cartCount > 9 ? '9+' : cartCount}
                     </span>
                   )}
                 </div>
-                <span className="text-[10px] font-semibold leading-none">
+                <span className="text-[10px] font-bold leading-none">
                   {cartCount > 0 ? formatRupiah(cartTotal).replace('Rp\u00a0', '') : 'Keranjang'}
                 </span>
               </button>
@@ -464,7 +476,7 @@ export default function MenuPage() {
             {/* Orders tab */}
             <button
               onClick={() => setActiveTab('orders')}
-              className={`flex-1 flex flex-col items-center justify-center gap-0.5 relative transition-colors ${
+              className={`flex-1 flex flex-col items-center justify-center gap-0.5 relative transition-colors duration-150 ${
                 activeTab === 'orders' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -474,42 +486,49 @@ export default function MenuPage() {
               <div className={`p-1.5 rounded-xl transition-colors ${activeTab === 'orders' ? 'bg-primary/10' : ''} relative`}>
                 <ClipboardList className="h-5 w-5" />
                 {orders.length > 0 && activeTab !== 'orders' && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[9px] min-w-[16px] h-[16px] rounded-full flex items-center justify-center font-bold px-0.5 leading-none">
+                  <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[9px] min-w-[16px] h-[16px] rounded-full flex items-center justify-center font-black px-0.5 leading-none">
                     {orders.length}
                   </span>
                 )}
               </div>
-              <span className="text-[10px] font-semibold leading-none">Pesanan</span>
+              <span className="text-[10px] font-bold leading-none">Pesanan</span>
             </button>
           </div>
         </div>
 
         {/* Cart Sheet */}
-        <SheetContent side="right" className="w-full sm:w-96 p-0 flex flex-col">
-          <SheetHeader className="px-5 py-4 border-b border-primary/10 flex-shrink-0 bg-gradient-to-r from-primary/8 to-accent/6">
-            <SheetTitle className="flex items-center gap-2 text-base">
-              <ShoppingCart className="h-4 w-4 text-primary" />
-              Keranjang Belanja
-              {cartCount > 0 && (
-                <span className="ml-auto bg-primary text-primary-foreground text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </SheetTitle>
-          </SheetHeader>
-          <div className="flex-1 overflow-y-auto">
-            <CartSidebar cartItems={cart.items} onNavigate={() => setCartSheetOpen(false)} inSheet />
+        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl px-0 pb-0 pt-0 border-primary/15">
+          <div className="flex flex-col h-full">
+            <SheetHeader className="px-5 pt-5 pb-3 border-b border-primary/10 bg-gradient-to-r from-primary/8 to-accent/5 flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <ShoppingCart className="h-4 w-4 text-primary" />
+                <SheetTitle className="text-base font-bold text-foreground text-left">
+                  Keranjang Belanja
+                </SheetTitle>
+                {cart.items.length > 0 && (
+                  <span className="ml-auto bg-primary text-primary-foreground text-xs font-black w-5 h-5 rounded-full flex items-center justify-center">
+                    {cart.items.reduce((s, i) => s + i.quantity, 0)}
+                  </span>
+                )}
+              </div>
+            </SheetHeader>
+            <div className="flex-1 overflow-hidden">
+              <CartSidebar
+                cartItems={cart.items}
+                inSheet
+                onNavigate={() => setCartSheetOpen(false)}
+              />
+            </div>
           </div>
         </SheetContent>
       </Sheet>
 
+      {/* Order detail modal */}
       {selectedOrder && (
         <OrderModal
           order={selectedOrder}
           isOpen={isOrderModalOpen}
-          onClose={() => { setSelectedOrder(null); setIsOrderModalOpen(false) }}
-          onUpdate={() => {}}
-          isAdminView={false}
+          onClose={() => { setIsOrderModalOpen(false); setSelectedOrder(null) }}
         />
       )}
     </div>

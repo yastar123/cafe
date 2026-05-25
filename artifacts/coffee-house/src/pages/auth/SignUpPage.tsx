@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase'
 import bcrypt from 'bcryptjs'
 import {
   Coffee, Eye, EyeOff, AlertCircle, UserPlus, ArrowRight,
-  Star, Gift, ClipboardCheck, CreditCard,
+  Star, Gift, ClipboardCheck, CreditCard, Clock,
 } from 'lucide-react'
 
 const perks = [
@@ -45,7 +45,7 @@ function PasswordStrength({ password }: { password: string }) {
           />
         ))}
       </div>
-      <p className={`text-[11px] font-medium ${
+      <p className={`text-[11px] font-semibold ${
         score <= 1 ? 'text-red-500' : score === 2 ? 'text-orange-500' :
         score === 3 ? 'text-amber-600' : score === 4 ? 'text-lime-600' : 'text-emerald-600'
       }`}>
@@ -56,15 +56,15 @@ function PasswordStrength({ password }: { password: string }) {
 }
 
 export default function SignUpPage() {
-  const [username, setUsername]             = useState('')
-  const [email, setEmail]                   = useState('')
-  const [password, setPassword]             = useState('')
+  const [username, setUsername]               = useState('')
+  const [email, setEmail]                     = useState('')
+  const [password, setPassword]               = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword]     = useState(false)
-  const [showConfirm, setShowConfirm]       = useState(false)
-  const [error, setError]                   = useState<string | null>(null)
-  const [isLoading, setIsLoading]           = useState(false)
-  const [, setLocation]                     = useLocation()
+  const [showPassword, setShowPassword]       = useState(false)
+  const [showConfirm, setShowConfirm]         = useState(false)
+  const [error, setError]                     = useState<string | null>(null)
+  const [isLoading, setIsLoading]             = useState(false)
+  const [, setLocation]                       = useLocation()
 
   const passwordsMatch = confirmPassword === '' || password === confirmPassword
 
@@ -106,41 +106,47 @@ export default function SignUpPage() {
     <div className="min-h-screen flex">
       {/* Left panel — tablet + desktop */}
       <div
-        className="hidden md:flex md:w-2/5 xl:w-1/2 flex-col items-center justify-center p-10 xl:p-12 relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, hsl(25 55% 20%) 0%, hsl(20 50% 14%) 100%)' }}
+        className="hidden md:flex md:w-2/5 xl:w-1/2 flex-col items-center justify-center p-10 xl:p-14 relative overflow-hidden"
+        style={{ background: 'linear-gradient(145deg, hsl(25 55% 20%) 0%, hsl(20 50% 14%) 60%, hsl(15 45% 10%) 100%)' }}
       >
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-56 h-56 bg-white/5 rounded-full blur-2xl" />
+          <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-white/4 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-60 h-60 bg-white/4 rounded-full blur-2xl" />
           <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full" />
-          <div className="absolute top-24 left-24 w-1.5 h-1.5 bg-white/15 rounded-full" />
+          <div className="absolute top-24 left-28 w-1.5 h-1.5 bg-white/12 rounded-full" />
           <div className="absolute top-48 left-14 w-1 h-1 bg-white/10 rounded-full" />
           <div className="absolute bottom-12 right-12 w-2 h-2 bg-white/20 rounded-full" />
-          <div className="absolute bottom-28 right-28 w-1.5 h-1.5 bg-white/15 rounded-full" />
+          <div className="absolute bottom-32 right-32 w-1.5 h-1.5 bg-white/12 rounded-full" />
         </div>
         <div className="relative z-10 text-center space-y-8 max-w-xs">
-          <div className="w-20 h-20 rounded-3xl bg-white/15 flex items-center justify-center mx-auto backdrop-blur-sm border border-white/20 shadow-xl">
+          <div className="w-20 h-20 rounded-3xl bg-white/12 flex items-center justify-center mx-auto backdrop-blur-sm border border-white/15 shadow-2xl">
             <Coffee className="h-10 w-10 text-white" />
           </div>
           <div>
-            <div className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-full px-3 py-1 mb-4">
+            <div className="inline-flex items-center gap-1.5 bg-white/10 border border-white/15 rounded-full px-3.5 py-1.5 mb-4">
               <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
-              <span className="text-white/80 text-xs font-medium">Bergabung Gratis</span>
+              <span className="text-white/80 text-xs font-semibold">Bergabung Gratis</span>
             </div>
             <h2 className="text-3xl font-bold text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
               Buat Akun Sekarang
             </h2>
-            <p className="text-white/60 mt-2 text-sm leading-relaxed">
+            <p className="text-white/55 mt-2.5 text-sm leading-relaxed">
               Daftar gratis dan nikmati kemudahan memesan kopi premium favorit Anda.
             </p>
           </div>
-          <div className="space-y-3 text-left">
+          <div className="space-y-2.5 text-left">
             {perks.map(({ icon: Icon, label }) => (
-              <div key={label} className="flex items-center gap-3 text-white/70 text-sm bg-white/5 rounded-xl px-4 py-2.5 border border-white/10">
-                <Icon className="h-4 w-4 text-white/50 flex-shrink-0" />
+              <div key={label} className="flex items-center gap-3 text-white/70 text-sm bg-white/6 rounded-xl px-4 py-3 border border-white/8">
+                <div className="w-7 h-7 rounded-lg bg-white/12 flex items-center justify-center flex-shrink-0">
+                  <Icon className="h-3.5 w-3.5 text-white/65" />
+                </div>
                 {label}
               </div>
             ))}
+          </div>
+          <div className="flex items-center justify-center gap-2 text-white/40 text-xs">
+            <Clock className="h-3.5 w-3.5" />
+            Buka setiap hari, 07.00 – 22.00
           </div>
         </div>
       </div>
@@ -148,12 +154,12 @@ export default function SignUpPage() {
       {/* Right panel — form */}
       <div className="flex-1 flex flex-col bg-background relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-primary/5 to-transparent rounded-full translate-x-1/3 -translate-y-1/4" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-accent/5 to-transparent rounded-full -translate-x-1/4 translate-y-1/4" />
+          <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-primary/5 to-transparent rounded-full translate-x-1/3 -translate-y-1/4 blur-2xl" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-accent/4 to-transparent rounded-full -translate-x-1/4 translate-y-1/4 blur-2xl" />
         </div>
 
         {/* Mobile: compact top brand bar */}
-        <div className="md:hidden flex items-center gap-3 px-5 pt-8 pb-4 relative">
+        <div className="md:hidden flex items-center gap-3 px-5 pt-6 pb-2 relative">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
               <Coffee className="h-4 w-4 text-primary-foreground" />
@@ -164,26 +170,25 @@ export default function SignUpPage() {
           </Link>
           <span className="ml-auto text-xs text-muted-foreground shrink-0">
             Sudah punya akun?{' '}
-            <Link href="/auth/login" className="text-primary font-semibold hover:underline">Masuk</Link>
+            <Link href="/auth/login" className="text-primary font-bold hover:underline">Masuk</Link>
           </span>
         </div>
 
         {/* Form area */}
-        <div className="flex-1 flex flex-col justify-center px-5 sm:px-8 pb-8 relative">
+        <div className="flex-1 flex flex-col justify-center px-5 sm:px-10 py-4 pb-6 relative">
           <div className="w-full max-w-sm mx-auto space-y-4">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>
+            <div className="animate-fade-in-up">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>
                 Buat Akun Baru
               </h1>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-1.5">
                 Daftar gratis dan mulai memesan menu lezat kami
               </p>
             </div>
 
-            <div className="bg-card border border-primary/12 rounded-2xl shadow-lg overflow-hidden">
+            <div className="bg-card border border-primary/12 rounded-2xl shadow-lg overflow-hidden animate-fade-in-up delay-100">
               <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary/50" />
-
-              <form onSubmit={handleSignUp} className="px-5 py-5 space-y-3.5">
+              <form onSubmit={handleSignUp} className="px-5 sm:px-6 py-5 space-y-3.5">
                 <div className="space-y-1.5">
                   <Label htmlFor="username" className="text-sm font-semibold">Nama Pengguna</Label>
                   <Input
@@ -214,7 +219,7 @@ export default function SignUpPage() {
                       className="border-primary/20 focus:border-primary/50 h-11 rounded-xl pr-11"
                     />
                     <button type="button" onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1">
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-primary/8">
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
@@ -235,12 +240,12 @@ export default function SignUpPage() {
                       }`}
                     />
                     <button type="button" onClick={() => setShowConfirm(!showConfirm)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1">
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-primary/8">
                       {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                   {!passwordsMatch && (
-                    <p className="text-[11px] text-red-500 font-medium flex items-center gap-1">
+                    <p className="text-[11px] text-red-500 font-semibold flex items-center gap-1">
                       <AlertCircle className="h-3 w-3" /> Kata sandi tidak cocok
                     </p>
                   )}
@@ -264,11 +269,10 @@ export default function SignUpPage() {
                       Membuat akun...
                     </span>
                   ) : (
-                    <><UserPlus className="h-4 w-4" />Daftar Akun Baru</>
+                    <><UserPlus className="h-4 w-4" />Daftar Akun Baru <ArrowRight className="h-4 w-4" /></>
                   )}
                 </Button>
 
-                {/* Tablet+: login link inside card */}
                 <p className="hidden md:block text-center text-sm text-muted-foreground pt-1">
                   Sudah punya akun?{' '}
                   <Link href="/auth/login" className="text-primary hover:underline font-semibold">Masuk di Sini</Link>
@@ -276,8 +280,8 @@ export default function SignUpPage() {
               </form>
             </div>
 
-            {/* Mobile perks — vertical list, readable */}
-            <div className="md:hidden space-y-2">
+            {/* Mobile perks */}
+            <div className="md:hidden space-y-2 animate-fade-in-up delay-200">
               {perks.map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-3 bg-card border border-primary/10 rounded-xl px-3.5 py-2.5 shadow-sm">
                   <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -288,7 +292,7 @@ export default function SignUpPage() {
               ))}
             </div>
 
-            <p className="text-center text-xs text-muted-foreground">
+            <p className="text-center text-xs text-muted-foreground animate-fade-in-up delay-300">
               <Link href="/" className="hover:text-primary hover:underline transition-colors">
                 ← Kembali ke Beranda
               </Link>
