@@ -3,17 +3,11 @@ import { useEffect, useState } from 'react'
 import { useCart } from '@/lib/store/cart'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Input } from '@/components/ui/input'
-import { ArrowLeft, Upload, CreditCard } from 'lucide-react'
+import { ArrowLeft, Upload, CreditCard, ShoppingBag } from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 import { toast } from 'sonner'
 
@@ -37,7 +31,7 @@ export default function CheckoutPage() {
   const { items: cartItems, getTotal, clearCart } = useCart()
   const [user, setUser] = useState<User | null>(null)
   const [paymentChannels, setPaymentChannels] = useState<PaymentChannel[]>([])
-  const [selectedMethod, setSelectedMethod] = useState<string>('')
+  const [selectedMethod, setSelectedMethod] = useState<string>('Tunai')
   const [notes, setNotes] = useState('')
   const [paymentProof, setPaymentProof] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -45,39 +39,41 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     const userData = sessionStorage.getItem('user')
-    if (!userData) {
-      setLocation('/auth/login')
-    } else {
-      setUser(JSON.parse(userData))
-    }
+    if (!userData) { setLocation('/auth/login'); return }
+    setUser(JSON.parse(userData))
   }, [setLocation])
 
   useEffect(() => {
     const fetchPaymentChannels = async () => {
-      const { data, error } = await supabase
-        .from('payment_channels')
-        .select('*')
-        .eq('active', true)
-        .order('created_at')
-
-      if (!error && data) {
-        setPaymentChannels(data)
-        if (data.length > 0) {
-          setSelectedMethod(data[0].name)
-        } else {
-          setSelectedMethod('Tunai')
+      try {
+        const { data, error } = await supabase
+          .from('payment_channels')
+          .select('*')
+          .eq('active', true)
+          .order('created_at')
+        if (!error && data) {
+          setPaymentChannels(data)
+          if (data.length > 0) setSelectedMethod(data[0].name)
         }
-      }
+      } catch {}
     }
     fetchPaymentChannels()
   }, [])
 
+  const total = getTotal()
+  const tax = total * 0.05
+  const finalTotal = total + tax
+
+  const selectedChannel = paymentChannels.find((c) => c.name === selectedMethod)
+  const isCash = selectedMethod === 'Tunai'
+
   if (!user || cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="border-primary/20">
-          <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground mb-4">Keranjang belanja Anda kosong</p>
+        <Card className="border-primary/20 max-w-sm w-full">
+          <CardContent className="pt-10 pb-8 text-center space-y-4">
+            <ShoppingBag className="h-12 w-12 mx-auto text-primary/30" />
+            <p className="text-muted-foreground">Keranjang belanja kosong</p>
             <Link href="/menu">
               <Button className="bg-primary hover:bg-primary/90">
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -90,16 +86,8 @@ export default function CheckoutPage() {
     )
   }
 
-  const total = getTotal()
-  const tax = total * 0.05
-  const finalTotal = total + tax
-
-  const selectedChannel = paymentChannels.find((c) => c.name === selectedMethod)
-  const isCash = selectedMethod === 'Tunai'
-
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!isCash && !paymentProof) {
       setError('Bukti pembayaran wajib diunggah untuk metode transfer/e-wallet')
       toast.error('Bukti pembayaran wajib diunggah')
@@ -117,10 +105,7 @@ export default function CheckoutPage() {
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('payment-proofs')
           .upload(fileName, paymentProof)
-
-        if (uploadError) {
-          throw new Error('Gagal mengunggah bukti pembayaran: ' + uploadError.message)
-        }
+        if (uploadError) throw new Error('Gagal mengunggah bukti pembayaran: ' + uploadError.message)
         paymentProofUrl = uploadData?.path
       }
 
@@ -140,7 +125,6 @@ export default function CheckoutPage() {
       if (orderError) throw new Error('Gagal menyimpan pesanan: ' + orderError.message)
 
       const orderId = orderData[0].id
-
       const orderItems = cartItems.map((item) => ({
         order_id: orderId,
         menu_item_id: item.menuItemId,
@@ -156,102 +140,106 @@ export default function CheckoutPage() {
       toast.success('Pesanan berhasil dibuat!')
       setLocation(`/order-success?orderId=${orderId}`)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Terjadi kesalahan saat checkout')
-      toast.error(err instanceof Error ? err.message : 'Gagal memproses checkout')
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan saat checkout'
+      setError(msg)
+      toast.error(msg)
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6">
-      <div className="max-w-6xl mx-auto">
-        <Link href="/menu" className="mb-6 flex items-center gap-2 text-primary hover:underline w-fit">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-5xl mx-auto px-4 md:px-6 py-6">
+        <Link href="/menu" className="inline-flex items-center gap-2 text-primary hover:underline mb-6 text-sm">
           <ArrowLeft className="h-4 w-4" />
           Kembali ke Menu
         </Link>
 
         <div className="grid lg:grid-cols-3 gap-6">
+          {/* Form */}
           <div className="lg:col-span-2">
             <Card className="border-primary/20">
               <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10">
-                <CardTitle className="text-2xl">Checkout Pembayaran</CardTitle>
-                <CardDescription>
-                  Selesaikan pesanan Anda dan pilih metode pembayaran di bawah ini
-                </CardDescription>
+                <CardTitle className="text-xl md:text-2xl">Checkout Pembayaran</CardTitle>
+                <CardDescription>Pilih metode pembayaran dan selesaikan pesanan Anda</CardDescription>
               </CardHeader>
-              <CardContent className="pt-6">
+              <CardContent className="pt-5">
                 <form onSubmit={handleSubmitOrder} className="space-y-6">
+                  {/* Payment method */}
                   <div>
-                    <Label className="text-base font-semibold mb-3 block text-foreground">
-                      Pilih Metode Pembayaran
-                    </Label>
-                    <RadioGroup value={selectedMethod} onValueChange={setSelectedMethod}>
+                    <Label className="text-sm font-semibold mb-3 block">Metode Pembayaran</Label>
+                    <RadioGroup value={selectedMethod} onValueChange={setSelectedMethod} className="space-y-2">
                       {paymentChannels.map((channel) => (
-                        <div
+                        <label
                           key={channel.id}
-                          className="flex items-center space-x-3 p-3 border border-primary/10 rounded-lg hover:bg-primary/5 cursor-pointer mt-2"
+                          htmlFor={`pay_${channel.id}`}
+                          className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all ${
+                            selectedMethod === channel.name
+                              ? 'border-primary bg-primary/5'
+                              : 'border-primary/15 hover:border-primary/30'
+                          }`}
                         >
-                          <RadioGroupItem value={channel.name} id={channel.id} />
-                          <Label htmlFor={channel.id} className="flex-1 cursor-pointer font-medium flex items-center gap-2">
-                            <CreditCard className="h-4 w-4 text-primary" />
-                            {channel.name}
-                          </Label>
-                        </div>
+                          <RadioGroupItem value={channel.name} id={`pay_${channel.id}`} />
+                          <CreditCard className="h-4 w-4 text-primary flex-shrink-0" />
+                          <span className="font-medium text-sm">{channel.name}</span>
+                        </label>
                       ))}
-                      <div className="flex items-center space-x-3 p-3 border border-primary/10 rounded-lg hover:bg-primary/5 cursor-pointer mt-2">
-                        <RadioGroupItem value="Tunai" id="payment_cash" />
-                        <Label htmlFor="payment_cash" className="flex-1 cursor-pointer font-medium">
-                          Bayar di Kasir (Tunai / Cash)
-                        </Label>
-                      </div>
+                      <label
+                        htmlFor="pay_cash"
+                        className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all ${
+                          selectedMethod === 'Tunai'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-primary/15 hover:border-primary/30'
+                        }`}
+                      >
+                        <RadioGroupItem value="Tunai" id="pay_cash" />
+                        <span className="font-medium text-sm">Bayar di Kasir (Tunai)</span>
+                      </label>
                     </RadioGroup>
                   </div>
 
+                  {/* Transfer info */}
                   {!isCash && selectedChannel && (
-                    <Card className="border-primary/10 bg-primary/5">
-                      <CardContent className="pt-4 space-y-3">
-                        <h4 className="font-bold text-primary">Informasi Rekening Tujuan</h4>
+                    <Card className="border-primary/15 bg-primary/5">
+                      <CardContent className="pt-4 pb-4 space-y-2">
+                        <h4 className="font-bold text-primary text-sm">Rekening Tujuan Transfer</h4>
                         {selectedChannel.account_number && (
                           <div>
-                            <span className="text-xs text-muted-foreground block">Nomor Rekening / Telepon:</span>
-                            <span className="font-bold text-lg select-all">{selectedChannel.account_number}</span>
+                            <p className="text-xs text-muted-foreground">No. Rekening / Telepon:</p>
+                            <p className="font-bold text-lg select-all">{selectedChannel.account_number}</p>
                           </div>
                         )}
                         {selectedChannel.account_name && (
                           <div>
-                            <span className="text-xs text-muted-foreground block">Atas Nama (A/N):</span>
-                            <span className="font-semibold">{selectedChannel.account_name}</span>
+                            <p className="text-xs text-muted-foreground">A/N:</p>
+                            <p className="font-semibold">{selectedChannel.account_name}</p>
                           </div>
                         )}
                         {selectedChannel.instructions && (
-                          <div>
-                            <span className="text-xs text-muted-foreground block">Instruksi Pembayaran:</span>
-                            <p className="text-xs text-muted-foreground whitespace-pre-line mt-1">
-                              {selectedChannel.instructions}
-                            </p>
-                          </div>
+                          <p className="text-xs text-muted-foreground whitespace-pre-line mt-1">
+                            {selectedChannel.instructions}
+                          </p>
                         )}
                       </CardContent>
                     </Card>
                   )}
 
                   {isCash && (
-                    <Card className="border-primary/10 bg-primary/5">
-                      <CardContent className="pt-4">
+                    <Card className="border-primary/15 bg-primary/5">
+                      <CardContent className="pt-4 pb-4">
                         <p className="text-sm text-muted-foreground">
-                          Silakan lakukan pembayaran langsung di kasir Coffee House saat Anda mengambil pesanan. Tunjukkan ID Pesanan Anda kepada barista kami.
+                          Lakukan pembayaran langsung di kasir saat mengambil pesanan. Tunjukkan ID Pesanan kepada barista kami.
                         </p>
                       </CardContent>
                     </Card>
                   )}
 
+                  {/* Upload proof */}
                   {!isCash && (
                     <div>
-                      <Label className="text-base font-semibold mb-3 block text-foreground">
-                        Unggah Bukti Pembayaran
-                      </Label>
-                      <div className="border-2 border-dashed border-primary/20 rounded-lg p-6 text-center hover:bg-primary/5 transition-colors">
+                      <Label className="text-sm font-semibold mb-2 block">Unggah Bukti Pembayaran <span className="text-red-500">*</span></Label>
+                      <div className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors hover:bg-primary/5 ${paymentProof ? 'border-primary/40 bg-primary/5' : 'border-primary/20'}`}>
                         <Input
                           type="file"
                           accept="image/*"
@@ -260,39 +248,38 @@ export default function CheckoutPage() {
                           id="proof-upload"
                         />
                         <label htmlFor="proof-upload" className="cursor-pointer flex flex-col items-center gap-2">
-                          <Upload className="h-8 w-8 text-primary/60" />
-                          <span className="text-sm font-medium text-foreground">
-                            {paymentProof ? paymentProof.name : 'Klik untuk mengunggah gambar bukti transfer'}
+                          <Upload className={`h-7 w-7 ${paymentProof ? 'text-primary' : 'text-primary/40'}`} />
+                          <span className="text-sm font-medium">
+                            {paymentProof ? paymentProof.name : 'Klik untuk unggah bukti transfer'}
                           </span>
-                          <span className="text-xs text-muted-foreground">
-                            (Format gambar: JPG, PNG, atau tangkapan layar)
-                          </span>
+                          <span className="text-xs text-muted-foreground">JPG, PNG, atau tangkapan layar</span>
                         </label>
                       </div>
                     </div>
                   )}
 
+                  {/* Notes */}
                   <div>
-                    <Label htmlFor="notes" className="text-base font-semibold block mb-2 text-foreground">
-                      Catatan Tambahan (Opsional)
+                    <Label htmlFor="notes" className="text-sm font-semibold block mb-2">
+                      Catatan (Opsional)
                     </Label>
                     <textarea
                       id="notes"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      placeholder="Contoh: Es batu dipisah, kurangi gula, dll."
-                      className="w-full p-3 border border-primary/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none text-sm"
+                      placeholder="Contoh: es batu dipisah, kurangi gula, dll."
+                      className="w-full p-3 border border-primary/15 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none text-sm bg-background"
                       rows={3}
                     />
                   </div>
 
                   {error && (
-                    <p className="text-sm text-red-500 bg-red-50 p-3 rounded">{error}</p>
+                    <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-100">{error}</p>
                   )}
 
                   <Button
                     type="submit"
-                    className="w-full bg-primary hover:bg-primary/90 h-10 font-medium"
+                    className="w-full bg-primary hover:bg-primary/90 h-11 font-medium text-base"
                     disabled={isLoading}
                   >
                     {isLoading ? 'Memproses Pesanan...' : 'Buat Pesanan Sekarang'}
@@ -302,29 +289,30 @@ export default function CheckoutPage() {
             </Card>
           </div>
 
+          {/* Summary */}
           <div>
-            <Card className="border-primary/10 sticky top-24">
+            <Card className="border-primary/10 lg:sticky lg:top-6">
               <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 pb-3">
-                <CardTitle>Ringkasan Pesanan</CardTitle>
+                <CardTitle className="text-base">Ringkasan Pesanan</CardTitle>
               </CardHeader>
-              <CardContent className="pt-6 space-y-3">
+              <CardContent className="pt-4 space-y-2">
                 {cartItems.map((item) => (
-                  <div key={item.menuItemId} className="flex justify-between text-sm border-b border-primary/10 pb-2">
-                    <span className="text-foreground">{item.name} x {item.quantity}</span>
-                    <span className="font-medium">{formatRupiah(item.price * item.quantity)}</span>
+                  <div key={item.menuItemId} className="flex justify-between text-sm pb-2 border-b border-primary/10 last:border-0">
+                    <span className="truncate pr-2">{item.name} <span className="text-muted-foreground">×{item.quantity}</span></span>
+                    <span className="font-medium flex-shrink-0">{formatRupiah(item.price * item.quantity)}</span>
                   </div>
                 ))}
-                <div className="pt-3 space-y-2 border-t border-primary/20">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Subtotal</span>
+                <div className="pt-2 space-y-1.5 border-t border-primary/20">
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Subtotal</span>
                     <span>{formatRupiah(total)}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Pajak PPN (5%)</span>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>PPN (5%)</span>
                     <span>{formatRupiah(tax)}</span>
                   </div>
-                  <div className="flex justify-between text-lg font-bold pt-2 border-t border-primary/10">
-                    <span>Total Pembayaran</span>
+                  <div className="flex justify-between font-bold text-base pt-1.5 border-t border-primary/10">
+                    <span>Total</span>
                     <span className="text-primary">{formatRupiah(finalTotal)}</span>
                   </div>
                 </div>

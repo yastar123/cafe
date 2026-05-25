@@ -1,13 +1,48 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase env vars not set. App will not function without VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.')
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
+
+// Chainable no-op builder — returns empty results without crashing
+function makeNoopBuilder(): any {
+  const noopResult = Promise.resolve({
+    data: null,
+    error: { message: 'Supabase belum dikonfigurasi. Set VITE_SUPABASE_URL dan VITE_SUPABASE_ANON_KEY di Secrets Replit.' },
+  })
+  const builder: any = new Proxy(noopResult, {
+    get(target, prop: string) {
+      // Bind promise methods directly to the real Promise so await works
+      if (prop === 'then' || prop === 'catch' || prop === 'finally') {
+        return (target as any)[prop].bind(target)
+      }
+      // All other methods return a new chainable builder
+      return () => makeNoopBuilder()
+    },
+  })
+  return builder
 }
 
-export const supabase = createClient(
-  supabaseUrl || '',
-  supabaseAnonKey || '',
+const noopStorage = new Proxy(
+  {},
+  {
+    get() {
+      return () => ({
+        upload: () => Promise.resolve({ data: null, error: { message: 'Not configured' } }),
+        getPublicUrl: () => ({ data: { publicUrl: '' } }),
+      })
+    },
+  }
 )
+
+const noopClient = new Proxy({} as SupabaseClient, {
+  get(_target, prop: string) {
+    if (prop === 'storage') return noopStorage
+    return () => makeNoopBuilder()
+  },
+})
+
+export const supabase: SupabaseClient = isSupabaseConfigured
+  ? createClient(supabaseUrl!, supabaseAnonKey!)
+  : noopClient

@@ -13,6 +13,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
 import bcrypt from 'bcryptjs'
+import { Coffee } from 'lucide-react'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
@@ -58,69 +59,70 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center p-6 md:p-10 bg-background">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+      {/* Logo */}
+      <Link href="/" className="flex items-center gap-2 mb-6 hover:opacity-80 transition-opacity">
+        <Coffee className="h-7 w-7 text-primary" />
+        <span className="text-2xl font-bold text-primary">Coffee House</span>
+      </Link>
+
       <div className="w-full max-w-sm">
-        <div className="flex flex-col gap-6">
-          <Card className="border-primary/20 shadow-xl">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10">
-              <CardTitle className="text-3xl font-extrabold text-primary">Selamat Datang</CardTitle>
-              <CardDescription>
-                Masuk untuk memesan kopi &amp; hidangan favorit Anda
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <form onSubmit={handleLogin}>
-                <div className="flex flex-col gap-6">
-                  <div className="grid gap-2">
-                    <Label htmlFor="username">Nama Pengguna (Username)</Label>
-                    <Input
-                      id="username"
-                      type="text"
-                      placeholder="username"
-                      required
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="border-primary/20"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="password">Kata Sandi (Password)</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="••••••••"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="border-primary/20"
-                    />
-                  </div>
-                  {error && (
-                    <p className="text-sm text-red-500 bg-red-50 p-3 rounded border border-red-100">
-                      {error}
-                    </p>
-                  )}
-                  <Button
-                    type="submit"
-                    className="w-full bg-primary hover:bg-primary/90 font-medium"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Memproses Masuk...' : 'Masuk Sekarang'}
-                  </Button>
-                </div>
-                <div className="mt-4 text-center text-sm">
-                  Belum punya akun?{' '}
-                  <Link
-                    href="/auth/sign-up"
-                    className="text-primary hover:underline font-bold"
-                  >
-                    Daftar Sekarang
-                  </Link>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="border-primary/20 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-t-xl">
+            <CardTitle className="text-2xl font-bold text-primary">Selamat Datang</CardTitle>
+            <CardDescription>
+              Masuk untuk memesan kopi &amp; hidangan favorit Anda
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-5">
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="username">Nama Pengguna</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="Masukkan username"
+                  required
+                  autoComplete="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="border-primary/20"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="password">Kata Sandi</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="border-primary/20"
+                />
+              </div>
+              {error && (
+                <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-100">
+                  {error}
+                </p>
+              )}
+              <Button
+                type="submit"
+                className="w-full bg-primary hover:bg-primary/90 font-medium"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Memproses...' : 'Masuk Sekarang'}
+              </Button>
+              <p className="text-center text-sm text-muted-foreground">
+                Belum punya akun?{' '}
+                <Link href="/auth/sign-up" className="text-primary hover:underline font-semibold">
+                  Daftar Sekarang
+                </Link>
+              </p>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

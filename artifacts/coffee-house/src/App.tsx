@@ -1,6 +1,7 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { Toaster } from "sonner";
 import AdminSidebar from "@/components/AdminSidebar";
+import ConfigBanner from "@/components/ConfigBanner";
 import HomePage from "@/pages/HomePage";
 import LoginPage from "@/pages/auth/LoginPage";
 import SignUpPage from "@/pages/auth/SignUpPage";
@@ -16,9 +17,9 @@ import AdminUsersPage from "@/pages/admin/AdminUsersPage";
 
 function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-background overflow-hidden">
       <AdminSidebar />
-      <main className="flex-1 overflow-auto">{children}</main>
+      <main className="flex-1 overflow-auto lg:pt-0 pt-14">{children}</main>
     </div>
   );
 }
@@ -84,6 +85,7 @@ function App() {
   return (
     <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
       <Router />
+      <ConfigBanner />
       <Toaster richColors position="top-center" />
     </WouterRouter>
   );
