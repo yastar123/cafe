@@ -256,13 +256,13 @@ export default function HomePage() {
               </h2>
               <p className="text-muted-foreground mt-1.5 text-sm">Kami hadirkan pengalaman kopi terbaik untuk Anda</p>
             </div>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="flex flex-col gap-3 sm:grid sm:grid-cols-2 md:grid-cols-3 sm:gap-4">
               {features.map(({ icon: Icon, title, desc, bg, iconBg, iconColor }) => (
-                <div key={title} className={`${bg} border rounded-2xl p-5 space-y-3 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group cursor-default`}>
-                  <div className={`${iconBg} w-11 h-11 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-sm`}>
+                <div key={title} className={`${bg} border rounded-2xl p-4 sm:p-5 flex sm:flex-col items-start gap-3.5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group cursor-default`}>
+                  <div className={`${iconBg} w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200 shadow-sm`}>
                     <Icon className={`h-5 w-5 ${iconColor}`} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="font-bold text-foreground text-sm">{title}</h3>
                     <p className="text-xs text-muted-foreground leading-relaxed mt-1">{desc}</p>
                   </div>

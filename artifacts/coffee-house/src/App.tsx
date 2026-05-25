@@ -2,6 +2,7 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { Toaster } from "sonner";
 import AdminSidebar from "@/components/AdminSidebar";
 import ConfigBanner from "@/components/ConfigBanner";
+import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/HomePage";
 import LoginPage from "@/pages/auth/LoginPage";
 import SignUpPage from "@/pages/auth/SignUpPage";
@@ -71,14 +72,7 @@ function Router() {
           </AdminLayout>
         )}
       </Route>
-      <Route>
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-foreground mb-2">404</h1>
-            <p className="text-muted-foreground">Halaman tidak ditemukan</p>
-          </div>
-        </div>
-      </Route>
+      <Route component={NotFound} />
     </Switch>
   );
 }
