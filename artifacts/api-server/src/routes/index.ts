@@ -6,6 +6,8 @@ import ordersRouter from "./orders";
 import usersRouter from "./users";
 import paymentsRouter from "./payments";
 import uploadRouter from "./upload";
+import categoriesRouter from "./categories";
+import rekapRouter from "./rekap";
 
 const router: IRouter = Router();
 
@@ -16,5 +18,7 @@ router.use(ordersRouter);
 router.use(usersRouter);
 router.use(paymentsRouter);
 router.use(uploadRouter);
+router.use(categoriesRouter);
+router.use(rekapRouter);
 
 export default router;

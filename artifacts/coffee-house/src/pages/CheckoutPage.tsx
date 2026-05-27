@@ -112,15 +112,15 @@ export default function CheckoutPage() {
       }
 
       const order = await api.orders.create({
-        totalAmount: finalTotal,
+        totalAmount: Number(finalTotal),
         paymentMethod: selectedMethod,
         notes,
         paymentProofUrl,
         items: cartItems.map((item) => ({
           menuItemId: item.menuItemId,
           quantity: item.quantity,
-          unitPrice: item.price,
-          subtotal: item.price * item.quantity,
+          unitPrice: Number(item.price), // ensure number, DB returns numeric as string
+          subtotal: Number(item.price) * item.quantity,
         })),
       })
 

@@ -11,6 +11,7 @@ interface MenuItem {
   description?: string
   category: string
   price: number
+  imageUrl?: string
   image_url?: string
   available: boolean
 }
@@ -68,9 +69,9 @@ export default function MenuGrid({ items }: MenuGridProps) {
     const cartItem: CartItem = {
       menuItemId: item.id,
       name: item.name,
-      price: item.price,
+      price: Number(item.price), // DB numeric returns string — convert to number
       quantity: 1,
-      image_url: item.image_url,
+      image_url: item.imageUrl || item.image_url,
     }
     addToCart(cartItem)
     toast.success(`${item.name} ditambahkan!`, {
@@ -107,10 +108,10 @@ export default function MenuGrid({ items }: MenuGridProps) {
             <div className={`h-0.5 ${style.topBar} opacity-60 flex-shrink-0`} />
 
             {/* Image / Placeholder */}
-            {item.image_url ? (
+            {(item.imageUrl || item.image_url) ? (
               <div className="relative w-full overflow-hidden bg-primary/5" style={{ aspectRatio: '4/3' }}>
                 <img
-                  src={item.image_url}
+                  src={item.imageUrl || item.image_url}
                   alt={item.name}
                   className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-400"
                 />

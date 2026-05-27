@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'wouter'
 import {
   BarChart3, ShoppingCart, Coffee, Users, LogOut,
-  CreditCard, Menu, X, LayoutDashboard,
+  CreditCard, Menu, X, LayoutDashboard, Tag, BarChart2,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useCart } from '@/lib/store/cart'
@@ -42,8 +42,10 @@ export default function AdminSidebar() {
     { href: '/admin',           label: 'Dasbor',            icon: LayoutDashboard },
     { href: '/admin/orders',    label: 'Pesanan Masuk',      icon: ShoppingCart },
     { href: '/admin/menu',      label: 'Daftar Menu',        icon: Coffee },
+    { href: '/admin/categories',label: 'Kategori Menu',      icon: Tag },
     { href: '/admin/payments',  label: 'Metode Pembayaran',  icon: CreditCard },
     { href: '/admin/users',     label: 'Pengguna',           icon: Users },
+    { href: '/admin/rekap',     label: 'Rekap Keuangan',     icon: BarChart2 },
   ]
 
   const initials = user?.username?.slice(0, 2).toUpperCase() ?? 'AD'

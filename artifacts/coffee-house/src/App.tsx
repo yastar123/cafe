@@ -16,6 +16,8 @@ import AdminOrdersPage from "@/pages/admin/AdminOrdersPage";
 import AdminMenuPage from "@/pages/admin/AdminMenuPage";
 import AdminPaymentsPage from "@/pages/admin/AdminPaymentsPage";
 import AdminUsersPage from "@/pages/admin/AdminUsersPage";
+import AdminCategoriesPage from "@/pages/admin/AdminCategoriesPage";
+import AdminRekapPage from "@/pages/admin/AdminRekapPage";
 
 function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -58,6 +60,13 @@ function Router() {
           </AdminLayout>
         )}
       </Route>
+      <Route path="/admin/categories">
+        {() => (
+          <AdminLayout>
+            <AdminCategoriesPage />
+          </AdminLayout>
+        )}
+      </Route>
       <Route path="/admin/payments">
         {() => (
           <AdminLayout>
@@ -69,6 +78,13 @@ function Router() {
         {() => (
           <AdminLayout>
             <AdminUsersPage />
+          </AdminLayout>
+        )}
+      </Route>
+      <Route path="/admin/rekap">
+        {() => (
+          <AdminLayout>
+            <AdminRekapPage />
           </AdminLayout>
         )}
       </Route>

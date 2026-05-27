@@ -87,6 +87,20 @@ export const api = {
       request<PaymentChannel>(`/admin/payment-channels/${id}`, { method: "PUT", body: JSON.stringify(data) }),
     delete: (id: string) => request(`/admin/payment-channels/${id}`, { method: "DELETE" }),
   },
+
+  categories: {
+    getAll: () => request<CategoryRecord[]>("/categories"),
+    create: (data: Partial<CategoryRecord>) =>
+      request<CategoryRecord>("/categories", { method: "POST", body: JSON.stringify(data) }),
+    update: (id: string, data: Partial<CategoryRecord>) =>
+      request<CategoryRecord>(`/categories/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+    delete: (id: string) => request(`/categories/${id}`, { method: "DELETE" }),
+  },
+
+  rekap: {
+    get: (from: string, to: string) =>
+      request<RekapData>(`/admin/rekap?from=${from}&to=${to}`),
+  },
 };
 
 export interface MenuItem {
@@ -185,3 +199,38 @@ export function clearUser() {
   sessionStorage.removeItem("user");
   sessionStorage.removeItem("authToken");
 }
+
+export interface CategoryRecord {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt?: string;
+  created_at?: string;
+}
+
+export interface RekapData {
+  summary: {
+    totalRevenue: number;
+    totalOrders: number;
+    confirmedOrders: number;
+    completedOrders: number;
+    pendingOrders: number;
+    cancelledOrders: number;
+    avgOrderValue: number;
+  };
+  dailyRevenue: { date: string; revenue: number; orders: number; confirmedOrders: number }[];
+  byPaymentMethod: { method: string; count: number; total: number }[];
+  byStatus: { status: string; count: number }[];
+  orders: {
+    id: string;
+    tanggal: string;
+    pelanggan: string;
+    email: string;
+    totalAmount: number;
+    metodePembayaran: string;
+    statusPembayaran: string;
+    statusPesanan: string;
+    catatan: string;
+  }[];
+}
+
