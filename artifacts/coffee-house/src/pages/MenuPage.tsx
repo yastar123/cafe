@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import { useCart } from '@/lib/store/cart'
 import MenuGrid from '@/components/MenuGrid'
@@ -61,6 +61,7 @@ export default function MenuPage() {
   const [items, setItems] = useState<MenuItem[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [isLoadingMenu, setIsLoadingMenu] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [activeTab, setActiveTab] = useState<'menu' | 'orders'>('menu')
@@ -69,8 +70,11 @@ export default function MenuPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false)
   const [cartSheetOpen, setCartSheetOpen] = useState(false)
+  const [prevCartCount, setPrevCartCount] = useState(0)
+  const [cartBadgeKey, setCartBadgeKey] = useState(0)
   const [, setLocation] = useLocation()
   const cart = useCart()
+  const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const userData = sessionStorage.getItem('user')
@@ -91,7 +95,7 @@ export default function MenuPage() {
     fetchMenuItems()
   }, [])
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     if (!user) return
     setIsLoadingOrders(true)
     try {
@@ -103,25 +107,45 @@ export default function MenuPage() {
       if (isSupabaseConfigured) toast.error('Gagal memuat pesanan')
     }
     setIsLoadingOrders(false)
-  }
+  }, [user])
 
   useEffect(() => {
     if (activeTab === 'orders' && user) fetchOrders()
-  }, [activeTab, user])
+  }, [activeTab, user, fetchOrders])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery)
+    }, 220)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  const cartCount = cart.items.reduce((s, i) => s + i.quantity, 0)
+  const cartTotal = cart.getTotal()
+
+  useEffect(() => {
+    if (cartCount > prevCartCount) {
+      setCartBadgeKey((k) => k + 1)
+    }
+    setPrevCartCount(cartCount)
+  }, [cartCount])
 
   const categories = Array.from(new Set(items.map((item) => item.category))).sort()
   const filteredItems = items.filter((item) => {
     const matchesCategory = !selectedCategory || item.category === selectedCategory
-    const q = searchQuery.toLowerCase()
+    const q = debouncedSearch.toLowerCase()
     const matchesSearch = !q || item.name.toLowerCase().includes(q) || item.description?.toLowerCase().includes(q)
     return matchesCategory && matchesSearch
   })
-  const cartCount = cart.items.reduce((s, i) => s + i.quantity, 0)
-  const cartTotal = cart.getTotal()
 
   const handleLogout = () => {
     sessionStorage.removeItem('user')
     setLocation('/auth/login')
+  }
+
+  const handleClearSearch = () => {
+    setSearchQuery('')
+    searchRef.current?.focus()
   }
 
   const greeting = getTimeGreeting()
@@ -132,7 +156,6 @@ export default function MenuPage() {
       {/* ── Header ── */}
       <header className="sticky top-0 z-40 border-b border-primary/10 bg-background/96 backdrop-blur-md shadow-sm">
         <div className="flex items-center px-4 md:px-6 py-3 gap-3 max-w-7xl mx-auto">
-          {/* Logo */}
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
               <Coffee className="h-4 w-4 text-primary-foreground" />
@@ -142,7 +165,6 @@ export default function MenuPage() {
             </span>
           </div>
 
-          {/* Greeting pill — desktop */}
           {user && (
             <div className="hidden sm:flex items-center gap-2 text-xs font-medium text-muted-foreground bg-primary/6 px-3 py-1.5 rounded-xl border border-primary/12 max-w-[180px]">
               <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
@@ -196,7 +218,6 @@ export default function MenuPage() {
         style={{ background: 'linear-gradient(100deg, hsl(35 88% 95%) 0%, hsl(30 58% 97%) 60%, hsl(25 38% 98%) 100%)' }}
       >
         <div className="px-4 py-3 flex items-center gap-3">
-          {/* Avatar */}
           <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center flex-shrink-0 shadow-sm">
             <span className="text-sm font-black text-primary-foreground">{userInitial}</span>
           </div>
@@ -209,12 +230,11 @@ export default function MenuPage() {
               </span>
             </p>
           </div>
-          {/* Tab switcher pills */}
           <div className="flex gap-1 flex-shrink-0">
             <button
               onClick={() => setActiveTab('menu')}
               className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
-                activeTab === 'menu' ? 'bg-primary text-white shadow-sm' : 'bg-black/6 text-foreground/60 hover:bg-black/10'
+                activeTab === 'menu' ? 'bg-primary text-white shadow-sm scale-105' : 'bg-black/6 text-foreground/60 hover:bg-black/10'
               }`}
             >
               <UtensilsCrossed className="h-3 w-3" />
@@ -223,7 +243,7 @@ export default function MenuPage() {
             <button
               onClick={() => setActiveTab('orders')}
               className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all relative ${
-                activeTab === 'orders' ? 'bg-primary text-white shadow-sm' : 'bg-black/6 text-foreground/60 hover:bg-black/10'
+                activeTab === 'orders' ? 'bg-primary text-white shadow-sm scale-105' : 'bg-black/6 text-foreground/60 hover:bg-black/10'
               }`}
             >
               <ClipboardList className="h-3 w-3" />
@@ -247,6 +267,7 @@ export default function MenuPage() {
               <div className="relative mb-3">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                 <input
+                  ref={searchRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -255,7 +276,7 @@ export default function MenuPage() {
                 />
                 {searchQuery && (
                   <button
-                    onClick={() => setSearchQuery('')}
+                    onClick={handleClearSearch}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0.5 rounded-md hover:bg-primary/8"
                   >
                     <X className="h-3.5 w-3.5" />
@@ -270,7 +291,7 @@ export default function MenuPage() {
                     onClick={() => setSelectedCategory(null)}
                     className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold transition-all border ${
                       selectedCategory === null
-                        ? 'bg-primary text-white border-primary shadow-sm shadow-primary/20'
+                        ? 'bg-primary text-white border-primary shadow-sm shadow-primary/20 scale-105'
                         : 'bg-card text-foreground/70 border-primary/15 hover:border-primary/30 hover:bg-primary/5'
                     }`}
                   >
@@ -282,7 +303,7 @@ export default function MenuPage() {
                       onClick={() => setSelectedCategory(cat)}
                       className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold transition-all border capitalize ${
                         selectedCategory === cat
-                          ? 'bg-primary text-white border-primary shadow-sm shadow-primary/20'
+                          ? 'bg-primary text-white border-primary shadow-sm shadow-primary/20 scale-105'
                           : 'bg-card text-foreground/70 border-primary/15 hover:border-primary/30 hover:bg-primary/5'
                       }`}
                     >
@@ -292,15 +313,31 @@ export default function MenuPage() {
                 </div>
               </div>
 
+              {/* Search result count */}
+              {debouncedSearch && !isLoadingMenu && (
+                <div className="flex items-center gap-2 mb-3 animate-fade-in">
+                  <span className="text-xs text-muted-foreground">
+                    {filteredItems.length > 0
+                      ? <><span className="font-bold text-primary">{filteredItems.length}</span> menu ditemukan untuk "<span className="font-medium">{debouncedSearch}</span>"</>
+                      : <>Tidak ada menu untuk "<span className="font-medium">{debouncedSearch}</span>"</>
+                    }
+                  </span>
+                </div>
+              )}
+
               {isLoadingMenu ? (
                 <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                   {[...Array(6)].map((_, i) => (
-                    <div key={i} className="rounded-2xl bg-primary/6 animate-pulse" style={{ aspectRatio: '3/4' }} />
+                    <div
+                      key={i}
+                      className="rounded-2xl skeleton-shimmer"
+                      style={{ aspectRatio: '3/4', animationDelay: `${i * 80}ms` }}
+                    />
                   ))}
                 </div>
               ) : items.length === 0 ? (
                 <div
-                  className="rounded-3xl mt-2 overflow-hidden border border-primary/10 shadow-sm"
+                  className="rounded-3xl mt-2 overflow-hidden border border-primary/10 shadow-sm animate-fade-in"
                   style={{ background: 'linear-gradient(160deg, hsl(35 80% 97%) 0%, hsl(25 50% 96%) 100%)' }}
                 >
                   <div className="px-6 py-16 text-center space-y-4">
@@ -320,15 +357,15 @@ export default function MenuPage() {
                   </div>
                 </div>
               ) : filteredItems.length === 0 ? (
-                <div className="text-center py-16 border-2 border-dashed border-primary/15 rounded-2xl bg-card/60 mt-2">
+                <div className="text-center py-16 border-2 border-dashed border-primary/15 rounded-2xl bg-card/60 mt-2 animate-fade-in">
                   <div className="w-14 h-14 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto mb-3">
                     <Search className="h-6 w-6 text-primary/30" />
                   </div>
                   <p className="font-semibold text-foreground/60 text-sm">
-                    {searchQuery ? `Tidak ada menu "${searchQuery}"` : 'Tidak ada menu di kategori ini.'}
+                    {debouncedSearch ? `Tidak ada menu "${debouncedSearch}"` : 'Tidak ada menu di kategori ini.'}
                   </p>
                   <button
-                    onClick={() => { setSearchQuery(''); setSelectedCategory(null) }}
+                    onClick={() => { setSearchQuery(''); setDebouncedSearch(''); setSelectedCategory(null) }}
                     className="text-xs text-primary hover:underline mt-2 inline-block font-medium"
                   >
                     Reset pencarian →
@@ -346,7 +383,7 @@ export default function MenuPage() {
           </div>
         ) : (
           /* Orders tab */
-          <div className="space-y-4 max-w-2xl">
+          <div className="space-y-4 max-w-2xl animate-fade-in">
             <div className="flex justify-between items-center">
               <div>
                 <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>
@@ -363,12 +400,12 @@ export default function MenuPage() {
             {isLoadingOrders ? (
               <div className="space-y-3">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-28 rounded-2xl bg-primary/5 animate-pulse" />
+                  <div key={i} className="h-28 rounded-2xl skeleton-shimmer" style={{ animationDelay: `${i * 100}ms` }} />
                 ))}
               </div>
             ) : orders.length === 0 ? (
               <div
-                className="rounded-3xl overflow-hidden border border-primary/10 shadow-sm"
+                className="rounded-3xl overflow-hidden border border-primary/10 shadow-sm animate-fade-in"
                 style={{ background: 'linear-gradient(160deg, hsl(35 80% 97%) 0%, hsl(25 50% 96%) 100%)' }}
               >
                 <div className="p-12 text-center space-y-4">
@@ -387,12 +424,16 @@ export default function MenuPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {orders.map((order) => {
+                {orders.map((order, idx) => {
                   const pCfg = paymentStatusConfig[order.payment_status] ?? { label: order.payment_status, cls: 'bg-gray-50 border-gray-200 text-gray-700' }
                   const oCfg = orderStatusConfig[order.order_status]   ?? { label: order.order_status,   cls: 'bg-gray-50 border-gray-200 text-gray-700' }
                   const OIcon = oCfg.icon
                   return (
-                    <div key={order.id} className="bg-card border border-primary/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200">
+                    <div
+                      key={order.id}
+                      className="bg-card border border-primary/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 animate-slide-up"
+                      style={{ animationDelay: `${idx * 60}ms` }}
+                    >
                       <div className="bg-gradient-to-r from-primary/6 to-accent/4 px-4 py-3 flex items-center justify-between border-b border-primary/8">
                         <div>
                           <p className="text-xs font-bold text-primary">#{order.id.slice(0, 8).toUpperCase()}</p>
@@ -443,17 +484,17 @@ export default function MenuPage() {
             {/* Menu tab */}
             <button
               onClick={() => setActiveTab('menu')}
-              className={`flex-1 flex flex-col items-center justify-center gap-0.5 relative transition-colors duration-150 ${
+              className={`flex-1 flex flex-col items-center justify-center gap-0.5 relative transition-all duration-200 ${
                 activeTab === 'menu' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {activeTab === 'menu' && (
                 <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-b-full" />
               )}
-              <div className={`p-1.5 rounded-xl transition-colors ${activeTab === 'menu' ? 'bg-primary/10' : ''}`}>
+              <div className={`p-1.5 rounded-xl transition-all duration-200 ${activeTab === 'menu' ? 'bg-primary/10 scale-110' : ''}`}>
                 <UtensilsCrossed className="h-5 w-5" />
               </div>
-              <span className="text-[10px] font-bold leading-none">Menu</span>
+              <span className={`text-[10px] font-bold leading-none transition-all ${activeTab === 'menu' ? 'text-primary' : ''}`}>Menu</span>
             </button>
 
             {/* Cart tab — opens sheet */}
@@ -462,7 +503,10 @@ export default function MenuPage() {
                 <div className="relative p-1.5">
                   <ShoppingCart className="h-5 w-5" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 bg-accent text-accent-foreground text-[9px] min-w-[16px] h-[16px] rounded-full flex items-center justify-center font-black px-0.5 leading-none shadow-sm">
+                    <span
+                      key={cartBadgeKey}
+                      className="absolute -top-0.5 -right-0.5 bg-accent text-accent-foreground text-[9px] min-w-[16px] h-[16px] rounded-full flex items-center justify-center font-black px-0.5 leading-none shadow-sm animate-cart-badge-pop"
+                    >
                       {cartCount > 9 ? '9+' : cartCount}
                     </span>
                   )}
@@ -476,58 +520,55 @@ export default function MenuPage() {
             {/* Orders tab */}
             <button
               onClick={() => setActiveTab('orders')}
-              className={`flex-1 flex flex-col items-center justify-center gap-0.5 relative transition-colors duration-150 ${
+              className={`flex-1 flex flex-col items-center justify-center gap-0.5 relative transition-all duration-200 ${
                 activeTab === 'orders' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {activeTab === 'orders' && (
                 <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-b-full" />
               )}
-              <div className={`p-1.5 rounded-xl transition-colors ${activeTab === 'orders' ? 'bg-primary/10' : ''} relative`}>
+              <div className={`p-1.5 rounded-xl transition-all duration-200 ${activeTab === 'orders' ? 'bg-primary/10 scale-110' : ''} relative`}>
                 <ClipboardList className="h-5 w-5" />
                 {orders.length > 0 && activeTab !== 'orders' && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[9px] min-w-[16px] h-[16px] rounded-full flex items-center justify-center font-black px-0.5 leading-none">
+                  <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center">
                     {orders.length}
                   </span>
                 )}
               </div>
-              <span className="text-[10px] font-bold leading-none">Pesanan</span>
+              <span className={`text-[10px] font-bold leading-none transition-all ${activeTab === 'orders' ? 'text-primary' : ''}`}>Pesanan</span>
             </button>
           </div>
         </div>
 
-        {/* Cart Sheet */}
-        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl px-0 pb-0 pt-0 border-primary/15">
-          <div className="flex flex-col h-full">
-            <SheetHeader className="px-5 pt-5 pb-3 border-b border-primary/10 bg-gradient-to-r from-primary/8 to-accent/5 flex-shrink-0">
-              <div className="flex items-center gap-2">
-                <ShoppingCart className="h-4 w-4 text-primary" />
-                <SheetTitle className="text-base font-bold text-foreground text-left">
-                  Keranjang Belanja
-                </SheetTitle>
-                {cart.items.length > 0 && (
-                  <span className="ml-auto bg-primary text-primary-foreground text-xs font-black w-5 h-5 rounded-full flex items-center justify-center">
-                    {cart.items.reduce((s, i) => s + i.quantity, 0)}
-                  </span>
-                )}
-              </div>
-            </SheetHeader>
-            <div className="flex-1 overflow-hidden">
-              <CartSidebar
-                cartItems={cart.items}
-                inSheet
-                onNavigate={() => setCartSheetOpen(false)}
-              />
-            </div>
+        <SheetContent side="bottom" className="rounded-t-3xl px-0 pt-0 max-h-[85vh] overflow-hidden flex flex-col">
+          <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+            <div className="w-10 h-1 rounded-full bg-primary/20" />
+          </div>
+          <SheetHeader className="px-5 pb-3 flex-shrink-0 border-b border-primary/10">
+            <SheetTitle className="flex items-center gap-2 text-base">
+              <ShoppingCart className="h-4 w-4 text-primary" />
+              Keranjang
+              {cartCount > 0 && (
+                <span className="ml-auto bg-primary text-primary-foreground text-xs font-black w-5 h-5 rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-hidden">
+            <CartSidebar
+              cartItems={cart.items}
+              onNavigate={() => setCartSheetOpen(false)}
+              inSheet
+            />
           </div>
         </SheetContent>
       </Sheet>
 
-      {/* Order detail modal */}
       {selectedOrder && (
         <OrderModal
           order={selectedOrder}
-          isOpen={isOrderModalOpen}
+          open={isOrderModalOpen}
           onClose={() => { setIsOrderModalOpen(false); setSelectedOrder(null) }}
         />
       )}

@@ -1,7 +1,7 @@
 import { useCart, type CartItem } from '@/lib/store/cart'
 import { Button } from '@/components/ui/button'
 import { useLocation } from 'wouter'
-import { Trash2, Minus, Plus, ShoppingBag, ArrowRight, Coffee, PackageCheck } from 'lucide-react'
+import { Trash2, Minus, Plus, ShoppingBag, ArrowRight, Coffee, PackageCheck, ShoppingCart } from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 
 interface CartSidebarProps {
@@ -48,12 +48,14 @@ export default function CartSidebar({ cartItems, onNavigate, inSheet }: CartSide
       )}
 
       {cartItems.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 px-4 text-center flex-1">
+        <div className="flex flex-col items-center justify-center py-16 px-4 text-center flex-1 animate-fade-in">
           <div className="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center mb-4">
-            <ShoppingBag className="h-7 w-7 text-primary/25" />
+            <ShoppingCart className="h-7 w-7 text-primary/25" />
           </div>
           <p className="text-sm font-bold text-foreground/55">Keranjang kosong</p>
-          <p className="text-xs text-muted-foreground mt-1.5 max-w-[180px] leading-relaxed">Tambah menu favoritmu untuk mulai pesan</p>
+          <p className="text-xs text-muted-foreground mt-1.5 max-w-[180px] leading-relaxed">
+            Tambah menu favoritmu untuk mulai pesan ☕
+          </p>
         </div>
       ) : (
         <div className="flex flex-col flex-1 overflow-hidden">
@@ -62,7 +64,8 @@ export default function CartSidebar({ cartItems, onNavigate, inSheet }: CartSide
             {cartItems.map((item, idx) => (
               <div
                 key={item.menuItemId}
-                className={`flex items-start gap-3 py-3 ${idx < cartItems.length - 1 ? 'border-b border-primary/8' : ''}`}
+                className={`flex items-start gap-3 py-3 animate-slide-up ${idx < cartItems.length - 1 ? 'border-b border-primary/8' : ''}`}
+                style={{ animationDelay: `${idx * 40}ms` }}
               >
                 {/* Thumbnail */}
                 <div className="w-11 h-11 rounded-xl flex-shrink-0 overflow-hidden mt-0.5 shadow-sm">
@@ -95,7 +98,8 @@ export default function CartSidebar({ cartItems, onNavigate, inSheet }: CartSide
                     </button>
                     <button
                       onClick={() => removeItem(item.menuItemId)}
-                      className="w-7 h-7 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-lg flex items-center justify-center transition-colors ml-0.5 press-effect"
+                      className="w-7 h-7 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-lg flex items-center justify-center transition-all ml-0.5 press-effect"
+                      title="Hapus item"
                     >
                       <Trash2 className="h-3 w-3" />
                     </button>

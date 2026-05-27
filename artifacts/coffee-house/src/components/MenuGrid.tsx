@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Plus, Minus, Coffee, Leaf, Snowflake, Cookie, Sandwich, UtensilsCrossed } from 'lucide-react'
 import { formatRupiah } from '@/lib/utils'
 import { toast } from 'sonner'
+import { useState } from 'react'
 
 interface MenuItem {
   id: string
@@ -34,6 +35,26 @@ function getCategoryStyle(category: string) {
   )
 }
 
+function AddButton({ onAdd }: { onAdd: () => void }) {
+  const [popping, setPopping] = useState(false)
+
+  const handleClick = () => {
+    onAdd()
+    setPopping(true)
+    setTimeout(() => setPopping(false), 320)
+  }
+
+  return (
+    <Button
+      size="sm"
+      onClick={handleClick}
+      className={`bg-primary hover:bg-primary/90 h-8 w-8 p-0 rounded-full shadow-sm hover:shadow-md transition-all flex-shrink-0 ${popping ? 'animate-pop' : 'press-effect'}`}
+    >
+      <Plus className="h-4 w-4" />
+    </Button>
+  )
+}
+
 export default function MenuGrid({ items }: MenuGridProps) {
   const addToCart = useCart((state) => state.addItem)
   const updateQuantity = useCart((state) => state.updateQuantity)
@@ -52,7 +73,10 @@ export default function MenuGrid({ items }: MenuGridProps) {
       image_url: item.image_url,
     }
     addToCart(cartItem)
-    toast.success(`${item.name} ditambahkan!`, { duration: 1500 })
+    toast.success(`${item.name} ditambahkan!`, {
+      duration: 1500,
+      icon: '☕',
+    })
   }
 
   const handleDecrement = (item: MenuItem) => {
@@ -62,20 +86,25 @@ export default function MenuGrid({ items }: MenuGridProps) {
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
-      {items.map((item) => {
+      {items.map((item, index) => {
         const style = getCategoryStyle(item.category)
         const PlaceholderIcon = style.icon
         const qty = getCartQuantity(item.id)
+        const staggerDelay = Math.min(index * 40, 300)
 
         return (
           <div
             key={item.id}
-            className="bg-card border border-primary/10 rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-0.5 transition-all duration-250 flex flex-col group relative"
+            className="bg-card border border-primary/10 rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-250 flex flex-col group relative animate-slide-up"
+            style={{ animationDelay: `${staggerDelay}ms` }}
           >
-            {/* In-cart highlight */}
+            {/* In-cart highlight ring */}
             {qty > 0 && (
-              <div className="absolute inset-0 ring-2 ring-primary/30 rounded-2xl pointer-events-none z-10" />
+              <div className="absolute inset-0 ring-2 ring-primary/35 rounded-2xl pointer-events-none z-10 transition-all duration-200" />
             )}
+
+            {/* Top category accent bar */}
+            <div className={`h-0.5 ${style.topBar} opacity-60 flex-shrink-0`} />
 
             {/* Image / Placeholder */}
             {item.image_url ? (
@@ -85,9 +114,9 @@ export default function MenuGrid({ items }: MenuGridProps) {
                   alt={item.name}
                   className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-400"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                 {qty > 0 && (
-                  <div className="absolute top-2.5 right-2.5 bg-primary text-primary-foreground text-xs font-black w-6 h-6 rounded-full flex items-center justify-center shadow-md z-20">
+                  <div className="absolute top-2.5 right-2.5 bg-primary text-primary-foreground text-xs font-black w-6 h-6 rounded-full flex items-center justify-center shadow-md z-20 animate-cart-badge-pop">
                     {qty}
                   </div>
                 )}
@@ -97,14 +126,13 @@ export default function MenuGrid({ items }: MenuGridProps) {
                 className={`w-full bg-gradient-to-br ${style.gradient} flex flex-col items-center justify-center gap-2 relative overflow-hidden`}
                 style={{ aspectRatio: '4/3' }}
               >
-                {/* Decorative circles */}
                 <div className="absolute top-2 right-4 w-16 h-16 rounded-full bg-white/15" />
                 <div className="absolute -bottom-4 -left-4 w-20 h-20 rounded-full bg-white/10" />
                 <div className={`relative w-14 h-14 rounded-2xl ${style.iconBg} backdrop-blur-sm flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-200`}>
                   <PlaceholderIcon className={`h-7 w-7 ${style.iconColor}`} />
                 </div>
                 {qty > 0 && (
-                  <div className="absolute top-2.5 right-2.5 bg-primary text-primary-foreground text-xs font-black w-6 h-6 rounded-full flex items-center justify-center shadow-md z-20">
+                  <div className="absolute top-2.5 right-2.5 bg-primary text-primary-foreground text-xs font-black w-6 h-6 rounded-full flex items-center justify-center shadow-md z-20 animate-cart-badge-pop">
                     {qty}
                   </div>
                 )}
@@ -133,15 +161,9 @@ export default function MenuGrid({ items }: MenuGridProps) {
                 </span>
 
                 {qty === 0 ? (
-                  <Button
-                    size="sm"
-                    onClick={() => handleAddToCart(item)}
-                    className="bg-primary hover:bg-primary/90 h-8 w-8 p-0 rounded-full shadow-sm hover:shadow-md transition-all press-effect flex-shrink-0"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
+                  <AddButton onAdd={() => handleAddToCart(item)} />
                 ) : (
-                  <div className="flex items-center gap-1 bg-primary/8 rounded-full px-1 py-0.5 flex-shrink-0">
+                  <div className="flex items-center gap-1 bg-primary/8 rounded-full px-1 py-0.5 flex-shrink-0 animate-slide-up">
                     <button
                       onClick={() => handleDecrement(item)}
                       className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-primary/20 transition-colors text-primary press-effect active:bg-primary/25"
