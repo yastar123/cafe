@@ -20,6 +20,22 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return res.json();
 }
 
+export async function uploadPaymentProof(file: File, token: string): Promise<string> {
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await fetch(`${API_BASE}/upload/payment-proof`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ error: "Upload gagal" }));
+    throw new Error(body.error ?? "Upload gagal");
+  }
+  const data = await res.json();
+  return data.url as string;
+}
+
 export const api = {
   auth: {
     login: (username: string, password: string) =>
@@ -124,6 +140,7 @@ export interface CreateOrderPayload {
   totalAmount: number;
   paymentMethod: string;
   notes?: string;
+  paymentProofUrl?: string;
   items: {
     menuItemId: string;
     quantity: number;

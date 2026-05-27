@@ -74,6 +74,7 @@ const createOrderSchema = z.object({
   totalAmount: z.number().positive(),
   paymentMethod: z.string().min(1),
   notes: z.string().optional(),
+  paymentProofUrl: z.string().optional(),
   items: z.array(z.object({
     menuItemId: z.string().uuid(),
     quantity: z.number().int().positive(),
@@ -89,7 +90,7 @@ router.post("/orders", requireAuth, async (req, res) => {
     res.status(400).json({ error: parsed.error.issues[0]?.message ?? "Invalid input" });
     return;
   }
-  const { totalAmount, paymentMethod, notes, items } = parsed.data;
+  const { totalAmount, paymentMethod, notes, paymentProofUrl, items } = parsed.data;
 
   const [order] = await db
     .insert(orders)
@@ -100,6 +101,7 @@ router.post("/orders", requireAuth, async (req, res) => {
       paymentStatus: "pending",
       orderStatus: "pending",
       notes,
+      paymentProofUrl,
     })
     .returning();
 

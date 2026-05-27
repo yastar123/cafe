@@ -11,11 +11,12 @@ import { toast } from 'sonner'
 import { formatRupiah } from '@/lib/utils'
 
 const MENU_CATEGORIES = [
-  { value: 'Coffee', label: 'Coffee' },
-  { value: 'Tea', label: 'Tea' },
-  { value: 'Cold Drinks', label: 'Cold Drinks' },
-  { value: 'Pastries', label: 'Pastries' },
-  { value: 'Sandwiches', label: 'Sandwiches' },
+  { value: 'Kopi', label: 'Kopi' },
+  { value: 'Non-Kopi', label: 'Non-Kopi' },
+  { value: 'Makanan', label: 'Makanan' },
+  { value: 'Minuman', label: 'Minuman' },
+  { value: 'Dessert', label: 'Dessert' },
+  { value: 'Snack', label: 'Snack' },
 ]
 
 interface MenuItem {
@@ -43,7 +44,7 @@ export default function AdminMenuPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
   const [formData, setFormData] = useState({
-    name: '', description: '', category: 'Coffee', price: '', available: true, imageUrl: '',
+    name: '', description: '', category: 'Kopi', price: '', available: true, imageUrl: '',
   })
 
   useEffect(() => { fetchItems() }, [])
@@ -124,7 +125,7 @@ export default function AdminMenuPage() {
   const handleDialogClose = () => {
     setIsDialogOpen(false)
     setEditingItem(null)
-    setFormData({ name: '', description: '', category: 'Coffee', price: '', available: true, imageUrl: '' })
+    setFormData({ name: '', description: '', category: 'Kopi', price: '', available: true, imageUrl: '' })
   }
 
   const categories = Array.from(new Set(items.map((i) => i.category)))
@@ -146,7 +147,7 @@ export default function AdminMenuPage() {
             <Button
               className="bg-primary hover:bg-primary/90 flex-shrink-0"
               size="sm"
-              onClick={() => { setEditingItem(null); setFormData({ name: '', description: '', category: 'Coffee', price: '', available: true, imageUrl: '' }); setIsDialogOpen(true) }}
+              onClick={() => { setEditingItem(null); setFormData({ name: '', description: '', category: 'Kopi', price: '', available: true, imageUrl: '' }); setIsDialogOpen(true) }}
             >
               <Plus className="h-4 w-4 mr-1.5" />
               Tambah Menu

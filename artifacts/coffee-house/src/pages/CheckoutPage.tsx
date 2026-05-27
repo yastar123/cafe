@@ -1,7 +1,7 @@
 import { useLocation, Link } from 'wouter'
 import { useEffect, useState } from 'react'
 import { useCart } from '@/lib/store/cart'
-import { api, getUser } from '@/lib/api'
+import { api, getUser, uploadPaymentProof } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -104,10 +104,18 @@ export default function CheckoutPage() {
     setError(null)
 
     try {
+      let paymentProofUrl: string | undefined
+      if (paymentProof && !isCash) {
+        const token = sessionStorage.getItem('authToken') ?? ''
+        toast.info('Mengunggah bukti pembayaran...')
+        paymentProofUrl = await uploadPaymentProof(paymentProof, token)
+      }
+
       const order = await api.orders.create({
         totalAmount: finalTotal,
         paymentMethod: selectedMethod,
         notes,
+        paymentProofUrl,
         items: cartItems.map((item) => ({
           menuItemId: item.menuItemId,
           quantity: item.quantity,
