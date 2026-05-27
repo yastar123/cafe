@@ -3,14 +3,14 @@
   "buildCommand": "pnpm run build",
   "outputDirectory": ".",
   "functions": {
-    "api/index.mjs": {
-      "includeFiles": "dist/**"
+    "artifacts/api-server/api/index.mjs": {
+      "includeFiles": "artifacts/api-server/dist/**"
     }
   },
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/api/index.mjs"
+      "destination": "/artifacts/api-server/api/index.mjs"
     }
   ]
 }
