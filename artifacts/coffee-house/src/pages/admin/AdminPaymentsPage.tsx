@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { api } from '@/lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,11 +11,16 @@ import { toast } from 'sonner'
 interface PaymentChannel {
   id: string
   name: string
+  accountNumber?: string
   account_number?: string
+  accountName?: string
   account_name?: string
   instructions?: string
   active: boolean
 }
+
+function getAccountNumber(c: PaymentChannel): string { return c.accountNumber ?? c.account_number ?? '' }
+function getAccountName(c: PaymentChannel): string { return c.accountName ?? c.account_name ?? '' }
 
 export default function AdminPaymentsPage() {
   const [channels, setChannels] = useState<PaymentChannel[]>([])
@@ -23,16 +28,15 @@ export default function AdminPaymentsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingChannel, setEditingChannel] = useState<PaymentChannel | null>(null)
   const [formData, setFormData] = useState({
-    name: '', account_number: '', account_name: '', instructions: '', active: true,
+    name: '', accountNumber: '', accountName: '', instructions: '', active: true,
   })
 
   useEffect(() => { fetchChannels() }, [])
 
   const fetchChannels = async () => {
     try {
-      const { data, error } = await supabase.from('payment_channels').select('*').order('created_at')
-      if (error) toast.error('Gagal mengambil metode pembayaran: ' + error.message)
-      else if (data) setChannels(data)
+      const data = await api.paymentChannels.getAll()
+      setChannels(data as PaymentChannel[])
     } catch { toast.error('Gagal memuat data') }
     setIsLoading(false)
   }
@@ -41,52 +45,65 @@ export default function AdminPaymentsPage() {
     e.preventDefault()
     try {
       if (editingChannel) {
-        const { error } = await supabase
-          .from('payment_channels')
-          .update({ name: formData.name, account_number: formData.account_number, account_name: formData.account_name, instructions: formData.instructions, active: formData.active })
-          .eq('id', editingChannel.id)
-        if (error) { toast.error('Gagal memperbarui: ' + error.message); return }
-        setChannels(channels.map((c) => c.id === editingChannel.id ? { ...c, ...formData } : c))
+        const updated = await api.paymentChannels.update(editingChannel.id, {
+          name: formData.name,
+          accountNumber: formData.accountNumber,
+          accountName: formData.accountName,
+          instructions: formData.instructions,
+          active: formData.active,
+        })
+        setChannels(channels.map((c) => c.id === editingChannel.id ? (updated as PaymentChannel) : c))
         toast.success('Metode pembayaran diperbarui')
       } else {
-        const { data, error } = await supabase
-          .from('payment_channels')
-          .insert([{ name: formData.name, account_number: formData.account_number, account_name: formData.account_name, instructions: formData.instructions, active: formData.active }])
-          .select()
-        if (error) { toast.error('Gagal menambahkan: ' + error.message); return }
-        if (data) setChannels([...channels, data[0]])
+        const created = await api.paymentChannels.create({
+          name: formData.name,
+          accountNumber: formData.accountNumber,
+          accountName: formData.accountName,
+          instructions: formData.instructions,
+          active: formData.active,
+        })
+        setChannels([...channels, created as PaymentChannel])
         toast.success('Metode pembayaran ditambahkan')
       }
       handleDialogClose()
-    } catch { toast.error('Terjadi kesalahan') }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Terjadi kesalahan')
+    }
   }
 
   const handleEdit = (channel: PaymentChannel) => {
     setEditingChannel(channel)
-    setFormData({ name: channel.name, account_number: channel.account_number || '', account_name: channel.account_name || '', instructions: channel.instructions || '', active: channel.active })
+    setFormData({
+      name: channel.name,
+      accountNumber: getAccountNumber(channel),
+      accountName: getAccountName(channel),
+      instructions: channel.instructions || '',
+      active: channel.active,
+    })
     setIsDialogOpen(true)
   }
 
   const handleDelete = async (id: string) => {
     if (!confirm('Hapus metode pembayaran ini?')) return
-    const { error } = await supabase.from('payment_channels').delete().eq('id', id)
-    if (error) toast.error('Gagal menghapus: ' + error.message)
-    else { setChannels(channels.filter((c) => c.id !== id)); toast.success('Dihapus') }
+    try {
+      await api.paymentChannels.delete(id)
+      setChannels(channels.filter((c) => c.id !== id))
+      toast.success('Dihapus')
+    } catch { toast.error('Gagal menghapus') }
   }
 
   const handleToggleActive = async (channel: PaymentChannel) => {
-    const { error } = await supabase.from('payment_channels').update({ active: !channel.active }).eq('id', channel.id)
-    if (error) toast.error('Gagal mengubah status')
-    else {
-      setChannels(channels.map((c) => c.id === channel.id ? { ...c, active: !c.active } : c))
+    try {
+      const updated = await api.paymentChannels.update(channel.id, { active: !channel.active })
+      setChannels(channels.map((c) => c.id === channel.id ? (updated as PaymentChannel) : c))
       toast.success(channel.active ? 'Dinonaktifkan' : 'Diaktifkan')
-    }
+    } catch { toast.error('Gagal mengubah status') }
   }
 
   const handleDialogClose = () => {
     setIsDialogOpen(false)
     setEditingChannel(null)
-    setFormData({ name: '', account_number: '', account_name: '', instructions: '', active: true })
+    setFormData({ name: '', accountNumber: '', accountName: '', instructions: '', active: true })
   }
 
   return (
@@ -106,7 +123,7 @@ export default function AdminPaymentsPage() {
             <Button
               className="bg-primary hover:bg-primary/90 flex-shrink-0"
               size="sm"
-              onClick={() => { setEditingChannel(null); setFormData({ name: '', account_number: '', account_name: '', instructions: '', active: true }); setIsDialogOpen(true) }}
+              onClick={() => { setEditingChannel(null); setFormData({ name: '', accountNumber: '', accountName: '', instructions: '', active: true }); setIsDialogOpen(true) }}
             >
               <Plus className="h-4 w-4 mr-1.5" />
               Tambah
@@ -123,12 +140,12 @@ export default function AdminPaymentsPage() {
                 <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required className="border-primary/20" />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="account_number">Nomor Rekening / Telepon</Label>
-                <Input id="account_number" value={formData.account_number} onChange={(e) => setFormData({ ...formData, account_number: e.target.value })} className="border-primary/20" />
+                <Label htmlFor="accountNumber">Nomor Rekening / Telepon</Label>
+                <Input id="accountNumber" value={formData.accountNumber} onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })} className="border-primary/20" />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="account_name">Nama Pemilik (A/N)</Label>
-                <Input id="account_name" value={formData.account_name} onChange={(e) => setFormData({ ...formData, account_name: e.target.value })} className="border-primary/20" />
+                <Label htmlFor="accountName">Nama Pemilik (A/N)</Label>
+                <Input id="accountName" value={formData.accountName} onChange={(e) => setFormData({ ...formData, accountName: e.target.value })} className="border-primary/20" />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="instructions">Instruksi (Opsional)</Label>
@@ -155,9 +172,7 @@ export default function AdminPaymentsPage() {
 
       {isLoading ? (
         <div className="grid md:grid-cols-2 gap-3">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-32 rounded-lg bg-primary/5 animate-pulse" />
-          ))}
+          {[...Array(3)].map((_, i) => <div key={i} className="h-32 rounded-lg bg-primary/5 animate-pulse" />)}
         </div>
       ) : channels.length === 0 ? (
         <div className="text-center py-16 border-2 border-dashed border-primary/15 rounded-xl">
@@ -191,22 +206,20 @@ export default function AdminPaymentsPage() {
                 </div>
               </CardHeader>
               <CardContent className="px-4 pb-4 space-y-1">
-                {channel.account_number && (
+                {getAccountNumber(channel) && (
                   <div>
                     <p className="text-xs text-muted-foreground">No. Rekening</p>
-                    <p className="font-bold text-sm">{channel.account_number}</p>
+                    <p className="font-bold text-sm">{getAccountNumber(channel)}</p>
                   </div>
                 )}
-                {channel.account_name && (
+                {getAccountName(channel) && (
                   <div>
                     <p className="text-xs text-muted-foreground">A/N</p>
-                    <p className="font-semibold text-sm">{channel.account_name}</p>
+                    <p className="font-semibold text-sm">{getAccountName(channel)}</p>
                   </div>
                 )}
                 {channel.instructions && (
-                  <CardDescription className="text-xs whitespace-pre-line pt-1">
-                    {channel.instructions}
-                  </CardDescription>
+                  <CardDescription className="text-xs whitespace-pre-line pt-1">{channel.instructions}</CardDescription>
                 )}
               </CardContent>
             </Card>

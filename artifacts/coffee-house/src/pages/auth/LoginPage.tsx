@@ -4,8 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { supabase } from '@/lib/supabase'
-import bcrypt from 'bcryptjs'
+import { api, setUser } from '@/lib/api'
 import { Coffee, Eye, EyeOff, AlertCircle, ArrowRight, Star, Zap, CreditCard, Clock } from 'lucide-react'
 
 const perks = [
@@ -27,26 +26,14 @@ export default function LoginPage() {
     setIsLoading(true)
     setError(null)
     try {
-      const { data: user, error: dbError } = await supabase
-        .from('users').select('*').eq('username', username).single()
-      if (dbError || !user) {
-        setError('Nama pengguna atau kata sandi salah')
-        toast.error('Nama pengguna atau kata sandi salah')
-        return
-      }
-      const isValid = await bcrypt.compare(password, user.password_hash)
-      if (!isValid) {
-        setError('Nama pengguna atau kata sandi salah')
-        toast.error('Nama pengguna atau kata sandi salah')
-        return
-      }
-      const safeUser = { id: user.id, username: user.username, email: user.email, role: user.role }
-      sessionStorage.setItem('user', JSON.stringify(safeUser))
+      const { token, user } = await api.auth.login(username, password)
+      setUser(user, token)
       toast.success('Selamat datang kembali, ' + user.username + '!')
       setLocation(user.role === 'admin' ? '/admin' : '/menu')
-    } catch {
-      setError('Terjadi kesalahan saat mencoba masuk')
-      toast.error('Gagal masuk, silakan coba lagi')
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan saat mencoba masuk'
+      setError(msg)
+      toast.error(msg)
     } finally {
       setIsLoading(false)
     }
@@ -95,7 +82,6 @@ export default function LoginPage() {
               </div>
             ))}
           </div>
-          {/* Operating hours */}
           <div className="flex items-center justify-center gap-2 text-white/40 text-xs">
             <Clock className="h-3.5 w-3.5" />
             Buka setiap hari, 07.00 – 22.00
@@ -110,7 +96,6 @@ export default function LoginPage() {
           <div className="absolute bottom-0 left-0 w-56 h-56 bg-gradient-to-tr from-accent/4 to-transparent rounded-full -translate-x-1/4 translate-y-1/4 blur-2xl" />
         </div>
 
-        {/* Mobile: compact top brand bar */}
         <div className="md:hidden flex items-center gap-3 px-5 pt-6 pb-2 relative">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
@@ -126,7 +111,6 @@ export default function LoginPage() {
           </span>
         </div>
 
-        {/* Form area */}
         <div className="flex-1 flex flex-col justify-center px-5 sm:px-10 py-6 relative">
           <div className="w-full max-w-sm mx-auto space-y-5">
             <div className="animate-fade-in-up">
@@ -138,7 +122,6 @@ export default function LoginPage() {
               </p>
             </div>
 
-            {/* Form card */}
             <div className="bg-card border border-primary/12 rounded-2xl shadow-lg overflow-hidden animate-fade-in-up delay-100">
               <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary/50" />
               <form onSubmit={handleLogin} className="px-5 sm:px-6 py-5 space-y-4">
@@ -201,7 +184,6 @@ export default function LoginPage() {
               </form>
             </div>
 
-            {/* Mobile perks */}
             <div className="md:hidden space-y-2 animate-fade-in-up delay-200">
               {perks.map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-3 bg-card border border-primary/10 rounded-xl px-3.5 py-2.5 shadow-sm">

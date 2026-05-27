@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { api } from '@/lib/api'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,7 +12,8 @@ interface User {
   username: string
   email: string
   role: string
-  created_at: string
+  createdAt?: string
+  created_at?: string
 }
 
 export default function AdminUsersPage() {
@@ -29,13 +30,10 @@ export default function AdminUsersPage() {
   const fetchUsers = async () => {
     setIsLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('id, username, email, role, created_at')
-        .order('created_at', { ascending: false })
-      if (error) toast.error('Gagal memuat pengguna: ' + error.message)
-      else if (data) { setUsers(data); setFilteredUsers(data) }
-    } catch {
+      const data = await api.users.getAll()
+      setUsers(data)
+      setFilteredUsers(data)
+    } catch (err) {
       toast.error('Gagal memuat pengguna')
     }
     setIsLoading(false)
@@ -55,24 +53,24 @@ export default function AdminUsersPage() {
   }, [filterRole, searchTerm, users])
 
   const handleRoleUpdate = async (id: string, newRole: string) => {
-    const { error } = await supabase.from('users').update({ role: newRole }).eq('id', id)
-    if (error) {
-      toast.error('Gagal memperbarui peran: ' + error.message)
-    } else {
+    try {
+      await api.users.updateRole(id, newRole)
       setUsers(users.map((u) => u.id === id ? { ...u, role: newRole } : u))
       toast.success('Peran berhasil diperbarui')
       setEditingId(null)
+    } catch (err) {
+      toast.error('Gagal memperbarui peran')
     }
   }
 
   const handleDelete = async (id: string) => {
     if (!confirm('Hapus pengguna ini?')) return
-    const { error } = await supabase.from('users').delete().eq('id', id)
-    if (error) {
-      toast.error('Gagal menghapus: ' + error.message)
-    } else {
+    try {
+      await api.users.delete(id)
       setUsers(users.filter((u) => u.id !== id))
       toast.success('Pengguna dihapus')
+    } catch (err) {
+      toast.error('Gagal menghapus pengguna')
     }
   }
 
@@ -118,9 +116,7 @@ export default function AdminUsersPage() {
 
       {isLoading ? (
         <div className="space-y-3">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-16 rounded-lg bg-primary/5 animate-pulse" />
-          ))}
+          {[...Array(4)].map((_, i) => <div key={i} className="h-16 rounded-lg bg-primary/5 animate-pulse" />)}
         </div>
       ) : filteredUsers.length === 0 ? (
         <div className="text-center py-16 border border-dashed border-primary/20 rounded-2xl">
@@ -132,61 +128,47 @@ export default function AdminUsersPage() {
           <CardContent className="pt-4 px-4 pb-4">
             <div className="space-y-2">
               {filteredUsers.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-3 border border-primary/10 rounded-xl hover:bg-primary/4 transition-colors gap-3">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm truncate">{user.username}</p>
-                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                      <div className="flex flex-wrap items-center gap-2 mt-1">
-                        {editingId === user.id ? (
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <Select value={editingRole} onValueChange={setEditingRole}>
-                              <SelectTrigger className="h-7 w-28 text-xs border-primary/20">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="customer">Pelanggan</SelectItem>
-                                <SelectItem value="admin">Admin</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <Button size="sm" className="h-7 text-xs bg-primary hover:bg-primary/90 px-2" onClick={() => handleRoleUpdate(user.id, editingRole)}>
-                              Simpan
-                            </Button>
-                            <Button size="sm" variant="ghost" className="h-7 text-xs px-2" onClick={() => setEditingId(null)}>
-                              Batal
-                            </Button>
-                          </div>
-                        ) : (
-                          <>
-                            <span className={`text-xs px-2 py-0.5 rounded ${user.role === 'admin' ? 'bg-primary/10 text-primary font-semibold' : 'bg-muted text-muted-foreground'}`}>
-                              {user.role === 'admin' ? 'Admin' : 'Pelanggan'}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(user.created_at).toLocaleDateString('id-ID')}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-1.5 flex-shrink-0">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => { setEditingId(user.id); setEditingRole(user.role) }}
-                        className="border-primary/20 h-8 w-8 p-0"
-                      >
-                        <Edit2 className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(user.id)}
-                        className="border-red-200 text-red-600 hover:bg-red-50 h-8 w-8 p-0"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
+                <div key={user.id} className="flex items-center justify-between p-3 border border-primary/10 rounded-xl hover:bg-primary/4 transition-colors gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm truncate">{user.username}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      {editingId === user.id ? (
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <Select value={editingRole} onValueChange={setEditingRole}>
+                            <SelectTrigger className="h-7 w-28 text-xs border-primary/20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="customer">Pelanggan</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Button size="sm" className="h-7 text-xs bg-primary hover:bg-primary/90 px-2" onClick={() => handleRoleUpdate(user.id, editingRole)}>Simpan</Button>
+                          <Button size="sm" variant="ghost" className="h-7 text-xs px-2" onClick={() => setEditingId(null)}>Batal</Button>
+                        </div>
+                      ) : (
+                        <>
+                          <span className={`text-xs px-2 py-0.5 rounded ${user.role === 'admin' ? 'bg-primary/10 text-primary font-semibold' : 'bg-muted text-muted-foreground'}`}>
+                            {user.role === 'admin' ? 'Admin' : 'Pelanggan'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(String(user.createdAt ?? user.created_at ?? '')).toLocaleDateString('id-ID')}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
-                ))}
+                  <div className="flex gap-1.5 flex-shrink-0">
+                    <Button size="sm" variant="outline" onClick={() => { setEditingId(user.id); setEditingRole(user.role) }} className="border-primary/20 h-8 w-8 p-0">
+                      <Edit2 className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => handleDelete(user.id)} className="border-red-200 text-red-600 hover:bg-red-50 h-8 w-8 p-0">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

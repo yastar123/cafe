@@ -4,8 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
-import { supabase } from '@/lib/supabase'
-import bcrypt from 'bcryptjs'
+import { api } from '@/lib/api'
 import {
   Coffee, Eye, EyeOff, AlertCircle, UserPlus, ArrowRight,
   Star, Gift, ClipboardCheck, CreditCard, Clock,
@@ -76,27 +75,13 @@ export default function SignUpPage() {
 
     setIsLoading(true)
     try {
-      const passwordHash = await bcrypt.hash(password, 10)
-      const { error: dbError } = await supabase
-        .from('users')
-        .insert([{ username, email, password_hash: passwordHash, role: 'customer' }])
-        .select()
-
-      if (dbError) {
-        let msg = dbError.message
-        if (msg.toLowerCase().includes('unique') && msg.toLowerCase().includes('username'))
-          msg = 'Nama pengguna sudah digunakan. Silakan pilih yang lain.'
-        else if (msg.toLowerCase().includes('unique') && msg.toLowerCase().includes('email'))
-          msg = 'Email sudah terdaftar. Silakan gunakan email lain.'
-        setError(msg)
-        toast.error(msg)
-      } else {
-        toast.success('Akun berhasil dibuat!')
-        setLocation('/auth/sign-up-success')
-      }
-    } catch {
-      setError('Terjadi kesalahan, silakan coba lagi')
-      toast.error('Gagal mendaftar')
+      await api.auth.register(username, email, password)
+      toast.success('Akun berhasil dibuat!')
+      setLocation('/auth/sign-up-success')
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan, silakan coba lagi'
+      setError(msg)
+      toast.error(msg)
     } finally {
       setIsLoading(false)
     }
@@ -104,7 +89,6 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel — tablet + desktop */}
       <div
         className="hidden md:flex md:w-2/5 xl:w-1/2 flex-col items-center justify-center p-10 xl:p-14 relative overflow-hidden"
         style={{ background: 'linear-gradient(145deg, hsl(25 55% 20%) 0%, hsl(20 50% 14%) 60%, hsl(15 45% 10%) 100%)' }}
@@ -151,14 +135,12 @@ export default function SignUpPage() {
         </div>
       </div>
 
-      {/* Right panel — form */}
       <div className="flex-1 flex flex-col bg-background relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-primary/5 to-transparent rounded-full translate-x-1/3 -translate-y-1/4 blur-2xl" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-accent/4 to-transparent rounded-full -translate-x-1/4 translate-y-1/4 blur-2xl" />
         </div>
 
-        {/* Mobile: compact top brand bar */}
         <div className="md:hidden flex items-center gap-3 px-5 pt-6 pb-2 relative">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
@@ -174,7 +156,6 @@ export default function SignUpPage() {
           </span>
         </div>
 
-        {/* Form area */}
         <div className="flex-1 flex flex-col justify-center px-5 sm:px-10 py-4 pb-6 relative">
           <div className="w-full max-w-sm mx-auto space-y-4">
             <div className="animate-fade-in-up">
@@ -280,7 +261,6 @@ export default function SignUpPage() {
               </form>
             </div>
 
-            {/* Mobile perks */}
             <div className="md:hidden space-y-2 animate-fade-in-up delay-200">
               {perks.map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-3 bg-card border border-primary/10 rounded-xl px-3.5 py-2.5 shadow-sm">
