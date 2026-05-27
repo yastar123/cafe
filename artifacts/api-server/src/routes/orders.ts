@@ -45,7 +45,7 @@ router.get("/admin/orders", requireAdmin, async (req, res) => {
 
 router.get("/orders/:id/items", requireAuth, async (req, res) => {
   const user = (req as any).user;
-  const order = await db.select().from(orders).where(eq(orders.id, req.params.id)).limit(1);
+  const order = await db.select().from(orders).where(eq(orders.id, String(req.params.id))).limit(1);
   if (!order.length) {
     res.status(404).json({ error: "Order not found" });
     return;
@@ -66,7 +66,7 @@ router.get("/orders/:id/items", requireAuth, async (req, res) => {
     })
     .from(orderItems)
     .leftJoin(menuItems, eq(orderItems.menuItemId, menuItems.id))
-    .where(eq(orderItems.orderId, req.params.id));
+    .where(eq(orderItems.orderId, String(req.params.id)));
   res.json(items);
 });
 
@@ -127,7 +127,7 @@ router.patch("/admin/orders/:id", requireAdmin, async (req, res) => {
   const [order] = await db
     .update(orders)
     .set(updateData)
-    .where(eq(orders.id, req.params.id))
+    .where(eq(orders.id, String(req.params.id)))
     .returning();
 
   if (!order) {

@@ -60,7 +60,7 @@ router.put("/menu/:id", requireAdmin, async (req, res) => {
   const [item] = await db
     .update(menuItems)
     .set(updateData)
-    .where(eq(menuItems.id, req.params.id))
+    .where(eq(menuItems.id, String(req.params.id)))
     .returning();
 
   if (!item) {
@@ -71,7 +71,7 @@ router.put("/menu/:id", requireAdmin, async (req, res) => {
 });
 
 router.delete("/menu/:id", requireAdmin, async (req, res) => {
-  await db.delete(menuItems).where(eq(menuItems.id, req.params.id));
+  await db.delete(menuItems).where(eq(menuItems.id, String(req.params.id)));
   res.json({ message: "Deleted" });
 });
 

@@ -81,7 +81,7 @@ router.put("/categories/:id", requireAdmin, async (req, res) => {
         name: validated.name,
         description: validated.description,
       })
-      .where(eq(categories.id, id))
+      .where(eq(categories.id, String(id)))
       .returning();
 
     if (!updated) {
@@ -107,7 +107,7 @@ router.delete("/categories/:id", requireAdmin, async (req, res) => {
     // Optional: you can check if category has menu items before deleting, but let's just delete
     const [deleted] = await db
       .delete(categories)
-      .where(eq(categories.id, id))
+      .where(eq(categories.id, String(id)))
       .returning();
 
     if (!deleted) {

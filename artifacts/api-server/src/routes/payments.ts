@@ -69,7 +69,7 @@ router.put("/admin/payment-channels/:id", requireAdmin, async (req, res) => {
   const [channel] = await db
     .update(paymentChannels)
     .set(updateData)
-    .where(eq(paymentChannels.id, req.params.id))
+    .where(eq(paymentChannels.id, String(req.params.id)))
     .returning();
 
   if (!channel) {
@@ -80,7 +80,7 @@ router.put("/admin/payment-channels/:id", requireAdmin, async (req, res) => {
 });
 
 router.delete("/admin/payment-channels/:id", requireAdmin, async (req, res) => {
-  await db.delete(paymentChannels).where(eq(paymentChannels.id, req.params.id));
+  await db.delete(paymentChannels).where(eq(paymentChannels.id, String(req.params.id)));
   res.json({ message: "Deleted" });
 });
 

@@ -29,7 +29,7 @@ router.patch("/admin/users/:id/role", requireAdmin, async (req, res) => {
   const [user] = await db
     .update(users)
     .set({ role })
-    .where(eq(users.id, req.params.id))
+    .where(eq(users.id, String(req.params.id)))
     .returning();
 
   if (!user) {
@@ -40,7 +40,7 @@ router.patch("/admin/users/:id/role", requireAdmin, async (req, res) => {
 });
 
 router.delete("/admin/users/:id", requireAdmin, async (req, res) => {
-  await db.delete(users).where(eq(users.id, req.params.id));
+  await db.delete(users).where(eq(users.id, String(req.params.id)));
   res.json({ message: "Deleted" });
 });
 
