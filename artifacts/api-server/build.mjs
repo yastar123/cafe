@@ -118,6 +118,35 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
     `,
     },
   });
+
+  // Build a second entry for Vercel serverless (app only, no listen)
+  await esbuild({
+    entryPoints: [path.resolve(artifactDir, "src/app.ts")],
+    platform: "node",
+    bundle: true,
+    format: "esm",
+    outdir: distDir,
+    outExtension: { ".js": ".mjs" },
+    logLevel: "silent",
+    external: [
+      "*.node", "sharp", "better-sqlite3", "sqlite3", "canvas", "bcrypt",
+      "argon2", "fsevents", "re2", "farmhash", "pg-native",
+    ],
+    sourcemap: false,
+    plugins: [
+      esbuildPluginPino({ transports: ["pino-pretty"] })
+    ],
+    banner: {
+      js: `import { createRequire as __bannerCrReq } from 'node:module';
+import __bannerPath from 'node:path';
+import __bannerUrl from 'node:url';
+
+globalThis.require = __bannerCrReq(import.meta.url);
+globalThis.__filename = __bannerUrl.fileURLToPath(import.meta.url);
+globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
+      `,
+    },
+  });
 }
 
 buildAll().catch((err) => {
