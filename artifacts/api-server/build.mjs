@@ -147,10 +147,58 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
       `,
     },
   });
-  // After building both bundles, copy routes to dist for serverless runtime
-  await cp(path.resolve(artifactDir, "src", "routes"), path.resolve(distDir, "routes"), { recursive: true }).catch(() => {});
-  // Also copy routes to dist/src/routes to satisfy import paths used by bundled code
-  await cp(path.resolve(artifactDir, "src", "routes"), path.resolve(distDir, "src", "routes"), { recursive: true }).catch(() => {});
+  // Bundle Vercel serverless handler as a fully self-contained file
+  // esbuildPluginPino adds worker files so we must use outdir, not outfile
+  const apiDir = path.resolve(artifactDir, "api");
+  const apiTmpDir = path.resolve(artifactDir, "api-tmp");
+  await rm(apiTmpDir, { recursive: true, force: true });
+
+  await esbuild({
+    entryPoints: [path.resolve(artifactDir, "src/vercel-handler.ts")],
+    platform: "node",
+    bundle: true,
+    format: "esm",
+    outdir: apiTmpDir,
+    outExtension: { ".js": ".mjs" },
+    logLevel: "info",
+    external: [
+      "*.node", "sharp", "better-sqlite3", "sqlite3", "canvas", "bcrypt",
+      "argon2", "fsevents", "re2", "farmhash", "pg-native",
+    ],
+    sourcemap: false,
+    plugins: [
+      esbuildPluginPino({ transports: ["pino-pretty"] })
+    ],
+    banner: {
+      js: `import { createRequire as __bannerCrReq } from 'node:module';
+import __bannerPath from 'node:path';
+import __bannerUrl from 'node:url';
+
+globalThis.require = __bannerCrReq(import.meta.url);
+globalThis.__filename = __bannerUrl.fileURLToPath(import.meta.url);
+globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
+      `,
+    },
+  });
+
+  // Move the bundled file and its pino workers to the api/ directory
+  const { rename, readdir, mkdir } = await import("node:fs/promises");
+  await mkdir(apiDir, { recursive: true });
+
+  const tmpFiles = await readdir(apiTmpDir);
+  for (const file of tmpFiles) {
+    const src = path.resolve(apiTmpDir, file);
+    // Rename main bundle to index.mjs; keep worker files as-is
+    const dest = file === "vercel-handler.mjs"
+      ? path.resolve(apiDir, "index.mjs")
+      : path.resolve(apiDir, file);
+    await rename(src, dest).catch(async () => {
+      // If rename fails (cross-device), fall back to copy+delete
+      const { cp: cpFs } = await import("node:fs/promises");
+      await cpFs(src, dest);
+    });
+  }
+  await rm(apiTmpDir, { recursive: true, force: true });
 }
 
 buildAll().catch((err) => {

@@ -2,15 +2,10 @@
   "version": 2,
   "buildCommand": "pnpm run build",
   "outputDirectory": ".",
-  "functions": {
-    "artifacts/api-server/api/index.mjs": {
-      "includeFiles": "artifacts/api-server/dist/**"
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/artifacts/api-server/api/index.mjs"
+      "destination": "/api/index.mjs"
     }
   ]
 }
