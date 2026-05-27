@@ -40,7 +40,8 @@ export default function LoginPage() {
         toast.error('Nama pengguna atau kata sandi salah')
         return
       }
-      sessionStorage.setItem('user', JSON.stringify(user))
+      const safeUser = { id: user.id, username: user.username, email: user.email, role: user.role }
+      sessionStorage.setItem('user', JSON.stringify(safeUser))
       toast.success('Selamat datang kembali, ' + user.username + '!')
       setLocation(user.role === 'admin' ? '/admin' : '/menu')
     } catch {

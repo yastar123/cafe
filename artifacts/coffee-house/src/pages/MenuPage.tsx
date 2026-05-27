@@ -66,7 +66,7 @@ export default function MenuPage() {
   const [user, setUser] = useState<any>(null)
   const [activeTab, setActiveTab] = useState<'menu' | 'orders'>('menu')
   const [orders, setOrders] = useState<Order[]>([])
-  const [isLoadingOrders, setIsLoadingOrders] = useState(true)
+  const [isLoadingOrders, setIsLoadingOrders] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false)
   const [cartSheetOpen, setCartSheetOpen] = useState(false)
@@ -174,13 +174,23 @@ export default function MenuPage() {
             </div>
           )}
 
-          <Button
-            variant="ghost" size="sm" onClick={handleLogout}
-            className="text-muted-foreground hover:text-red-500 hover:bg-red-50 h-8 px-2 rounded-lg text-xs gap-1.5 flex-shrink-0 transition-colors duration-200"
-          >
-            <LogOut className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Keluar</span>
-          </Button>
+          {user ? (
+            <Button
+              variant="ghost" size="sm" onClick={handleLogout}
+              className="text-muted-foreground hover:text-red-500 hover:bg-red-50 h-8 px-2 rounded-lg text-xs gap-1.5 flex-shrink-0 transition-colors duration-200"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Keluar</span>
+            </Button>
+          ) : (
+            <Button
+              variant="ghost" size="sm" onClick={() => setLocation('/auth/login')}
+              className="text-primary hover:text-primary/80 hover:bg-primary/8 h-8 px-3 rounded-lg text-xs gap-1.5 flex-shrink-0 font-semibold"
+            >
+              <LogOut className="h-3.5 w-3.5 rotate-180" />
+              <span className="hidden sm:inline">Masuk</span>
+            </Button>
+          )}
         </div>
       </header>
 
@@ -397,7 +407,25 @@ export default function MenuPage() {
               </Button>
             </div>
 
-            {isLoadingOrders ? (
+            {!user ? (
+              <div
+                className="rounded-3xl overflow-hidden border border-primary/10 shadow-sm animate-fade-in"
+                style={{ background: 'linear-gradient(160deg, hsl(35 80% 97%) 0%, hsl(25 50% 96%) 100%)' }}
+              >
+                <div className="p-12 text-center space-y-4">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto">
+                    <LogOut className="h-7 w-7 text-primary/30 rotate-180" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-foreground/70">Masuk untuk melihat pesanan</p>
+                    <p className="text-sm text-muted-foreground mt-1">Buat akun atau masuk untuk melacak pesananmu.</p>
+                  </div>
+                  <Button onClick={() => setLocation('/auth/login')} className="bg-primary hover:bg-primary/90 shadow-sm rounded-xl gap-2">
+                    Masuk Sekarang
+                  </Button>
+                </div>
+              </div>
+            ) : isLoadingOrders ? (
               <div className="space-y-3">
                 {[...Array(3)].map((_, i) => (
                   <div key={i} className="h-28 rounded-2xl skeleton-shimmer" style={{ animationDelay: `${i * 100}ms` }} />
@@ -568,8 +596,10 @@ export default function MenuPage() {
       {selectedOrder && (
         <OrderModal
           order={selectedOrder}
-          open={isOrderModalOpen}
+          isOpen={isOrderModalOpen}
           onClose={() => { setIsOrderModalOpen(false); setSelectedOrder(null) }}
+          onUpdate={() => {}}
+          isAdminView={false}
         />
       )}
     </div>
