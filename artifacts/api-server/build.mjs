@@ -152,6 +152,7 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
   const apiDir = path.resolve(artifactDir, "api");
   const apiTmpDir = path.resolve(artifactDir, "api-tmp");
   await rm(apiTmpDir, { recursive: true, force: true });
+  await rm(apiDir, { recursive: true, force: true });
 
   await esbuild({
     entryPoints: [path.resolve(artifactDir, "src/vercel-handler.ts")],
@@ -159,7 +160,7 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
     bundle: true,
     format: "esm",
     outdir: apiTmpDir,
-    outExtension: { ".js": ".mjs" },
+    outExtension: { ".js": ".js" },
     logLevel: "info",
     external: [
       "*.node", "sharp", "better-sqlite3", "sqlite3", "canvas", "bcrypt",
@@ -182,15 +183,18 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
   });
 
   // Move the bundled file and its pino workers to the api/ directory
-  const { rename, readdir, mkdir } = await import("node:fs/promises");
+  const { rename, readdir, mkdir, rm: rmFs } = await import("node:fs/promises");
   await mkdir(apiDir, { recursive: true });
+  
+  // Clean up any old index.mjs
+  await rmFs(path.resolve(apiDir, "index.mjs"), { force: true });
 
   const tmpFiles = await readdir(apiTmpDir);
   for (const file of tmpFiles) {
     const src = path.resolve(apiTmpDir, file);
-    // Rename main bundle to index.mjs; keep worker files as-is
-    const dest = file === "vercel-handler.mjs"
-      ? path.resolve(apiDir, "index.mjs")
+    // Rename main bundle to index.js; keep worker files as-is
+    const dest = file === "vercel-handler.js"
+      ? path.resolve(apiDir, "index.js")
       : path.resolve(apiDir, file);
     await rename(src, dest).catch(async () => {
       // If rename fails (cross-device), fall back to copy+delete
