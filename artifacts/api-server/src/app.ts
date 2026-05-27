@@ -6,25 +6,23 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
-app.use(
-  (pinoHttp as any)({
-    logger,
-    serializers: {
-      req(req: any) {
-        return {
-          id: req.id,
-          method: req.method,
-          url: req.url?.split("?")[0],
-        };
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
+  app.use(
+    (pinoHttp as any)({
+      logger,
+      serializers: {
+        req(req: any) {
+          return { id: req.id, method: req.method, url: req.url?.split("?")[0] };
+        },
+        res(res: any) {
+          return { statusCode: res.statusCode };
+        },
       },
-      res(res: any) {
-        return {
-          statusCode: res.statusCode,
-        };
-      },
-    },
-  }),
-);
+    })
+  );
+}
+
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

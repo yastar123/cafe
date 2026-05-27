@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build as esbuild } from "esbuild";
 import esbuildPluginPino from "esbuild-plugin-pino";
-import { rm } from "node:fs/promises";
+import { rm, cp } from "node:fs/promises";
 
 // Plugins (e.g. 'esbuild-plugin-pino') may use `require` to resolve dependencies
 globalThis.require = createRequire(import.meta.url);
@@ -147,6 +147,8 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
       `,
     },
   });
+  // After building both bundles, copy routes to dist for serverless runtime
+  await cp(path.resolve(artifactDir, "src", "routes"), path.resolve(distDir, "routes"), { recursive: true }).catch(() => {});
 }
 
 buildAll().catch((err) => {
