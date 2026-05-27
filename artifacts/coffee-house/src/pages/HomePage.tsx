@@ -116,7 +116,7 @@ export default function HomePage() {
       <main className="flex-1">
         {/* ── Hero ── */}
         <section
-          className="relative overflow-hidden px-4 pt-10 pb-10 md:pt-16 md:pb-16"
+          className="relative overflow-hidden px-4 pt-8 pb-8 sm:pt-10 sm:pb-10 md:pt-16 md:pb-16"
           style={{ background: 'linear-gradient(150deg, hsl(35 95% 94%) 0%, hsl(30 65% 95%) 40%, hsl(25 40% 97%) 100%)' }}
         >
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -131,16 +131,41 @@ export default function HomePage() {
           </div>
 
           <div className="relative max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div className="grid md:grid-cols-2 gap-6 md:gap-12 items-center">
+
+              {/* Illustration — on mobile shows first, centered and compact */}
+              <div className="flex items-center justify-center order-1 md:order-2 animate-fade-in delay-200">
+                <div className="relative w-44 h-44 sm:w-64 sm:h-64 md:w-[300px] md:h-[300px] lg:w-[340px] lg:h-[340px] animate-float">
+                  <div className="absolute -inset-6 rounded-full bg-gradient-to-br from-primary/15 to-accent/10 blur-3xl opacity-70" />
+                  <div
+                    className="absolute inset-0 rounded-full border border-primary/12 shadow-2xl"
+                    style={{ background: 'radial-gradient(circle at 35% 30%, hsl(35 85% 93%) 0%, hsl(30 60% 90%) 55%, hsl(28 48% 88%) 100%)' }}
+                  />
+                  <div className="absolute inset-5 rounded-full border border-primary/8" />
+                  <div className="absolute inset-[22px]">
+                    <CoffeeCupIllustration />
+                  </div>
+                  {/* Floating badge — menu count */}
+                  <div className="flex absolute -top-1 -right-2 sm:-right-4 items-center gap-1.5 bg-white border border-primary/15 rounded-2xl px-2.5 sm:px-3 py-1 sm:py-1.5 shadow-lg shadow-primary/12 animate-scale-in delay-400">
+                    <Coffee className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-primary" />
+                    <p className="text-[11px] sm:text-xs font-bold text-primary whitespace-nowrap">50+ Menu</p>
+                  </div>
+                  {/* Floating badge — ready time */}
+                  <div className="flex absolute bottom-3 -left-3 sm:-left-6 items-center gap-1.5 bg-white border border-emerald-200 rounded-2xl px-2.5 sm:px-3 py-1 sm:py-1.5 shadow-lg shadow-emerald-100 animate-scale-in delay-500">
+                    <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    <p className="text-[11px] sm:text-xs font-bold text-emerald-600 whitespace-nowrap">Siap 5 menit</p>
+                  </div>
+                </div>
+              </div>
 
               {/* Text */}
-              <div className="space-y-5 text-center md:text-left order-2 md:order-1 animate-fade-in-up">
-                <div className="inline-flex items-center gap-2 bg-primary/12 text-primary px-4 py-1.5 rounded-full text-xs font-bold border border-primary/20 shadow-sm">
+              <div className="space-y-4 sm:space-y-5 text-center md:text-left order-2 md:order-1 animate-fade-in-up">
+                <div className="inline-flex items-center gap-2 bg-primary/12 text-primary px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold border border-primary/20 shadow-sm">
                   <Star className="h-3 w-3 fill-primary" />
                   Kopi Premium, Layanan Terbaik
                 </div>
                 <h1
-                  className="text-[2.1rem] sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold text-foreground leading-[1.12]"
+                  className="text-[1.85rem] xs:text-[2.1rem] sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold text-foreground leading-[1.12]"
                   style={{ fontFamily: 'Playfair Display, serif' }}
                 >
                   Nikmati Setiap{' '}
@@ -155,7 +180,7 @@ export default function HomePage() {
                 </p>
 
                 {/* Trust signals */}
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-xs text-muted-foreground">
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1.5">
                     <MapPin className="h-3.5 w-3.5 text-primary/60" />
                     Ambil di Gerai
@@ -172,45 +197,20 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start pt-1">
-                  <Link href="/auth/sign-up" className="sm:flex-none">
-                    <Button className="bg-primary hover:bg-primary/90 h-12 px-8 text-sm font-semibold shadow-lg shadow-primary/25 inline-flex items-center gap-2 w-full sm:w-auto press-effect rounded-xl">
+                <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-center md:justify-start pt-1">
+                  <Link href="/auth/sign-up">
+                    <Button className="bg-primary hover:bg-primary/90 h-11 sm:h-12 px-6 sm:px-8 text-sm font-semibold shadow-lg shadow-primary/25 inline-flex items-center gap-2 w-full press-effect rounded-xl">
                       Mulai Pesan Sekarang
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </Link>
-                  <Link href="/auth/login" className="sm:flex-none">
-                    <Button variant="outline" className="border-primary/25 bg-white/70 backdrop-blur-sm h-12 px-8 text-sm font-medium text-primary hover:bg-white/90 w-full sm:w-auto rounded-xl shadow-sm">
+                  <Link href="/auth/login">
+                    <Button variant="outline" className="border-primary/25 bg-white/70 backdrop-blur-sm h-11 sm:h-12 px-6 sm:px-8 text-sm font-medium text-primary hover:bg-white/90 w-full rounded-xl shadow-sm">
                       Sudah Punya Akun?
                     </Button>
                   </Link>
                 </div>
                 <p className="text-xs text-muted-foreground/60">Bergabung dengan pelanggan setia Coffee House ☕</p>
-              </div>
-
-              {/* Illustration */}
-              <div className="flex items-center justify-center order-1 md:order-2 animate-fade-in delay-200">
-                <div className="relative w-52 h-52 sm:w-64 sm:h-64 md:w-[300px] md:h-[300px] lg:w-[340px] lg:h-[340px] animate-float">
-                  <div className="absolute -inset-6 rounded-full bg-gradient-to-br from-primary/15 to-accent/10 blur-3xl opacity-70" />
-                  <div
-                    className="absolute inset-0 rounded-full border border-primary/12 shadow-2xl"
-                    style={{ background: 'radial-gradient(circle at 35% 30%, hsl(35 85% 93%) 0%, hsl(30 60% 90%) 55%, hsl(28 48% 88%) 100%)' }}
-                  />
-                  <div className="absolute inset-5 rounded-full border border-primary/8" />
-                  <div className="absolute inset-[22px]">
-                    <CoffeeCupIllustration />
-                  </div>
-                  {/* Floating badge — menu count */}
-                  <div className="hidden sm:flex absolute -top-1 -right-2 md:-right-5 items-center gap-1.5 bg-white border border-primary/15 rounded-2xl px-3 py-1.5 shadow-lg shadow-primary/12 animate-scale-in delay-400">
-                    <Coffee className="h-3.5 w-3.5 text-primary" />
-                    <p className="text-xs font-bold text-primary whitespace-nowrap">50+ Menu</p>
-                  </div>
-                  {/* Floating badge — ready time */}
-                  <div className="hidden sm:flex absolute bottom-4 -left-4 md:-left-8 items-center gap-1.5 bg-white border border-emerald-200 rounded-2xl px-3 py-1.5 shadow-lg shadow-emerald-100 animate-scale-in delay-500">
-                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                    <p className="text-xs font-bold text-emerald-600 whitespace-nowrap">Siap 5 menit</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -219,13 +219,13 @@ export default function HomePage() {
         {/* ── Stats strip ── */}
         <section className="border-y border-primary/10 bg-white/80 backdrop-blur-sm shadow-sm px-4 py-4">
           <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-4 gap-2 sm:gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
               {stats.map(({ value, label, color, bg, border }) => (
-                <div key={label} className={`${bg} ${border} border rounded-xl sm:rounded-2xl px-2 sm:px-4 py-3 text-center`}>
-                  <p className={`text-lg sm:text-2xl font-bold ${color}`} style={{ fontFamily: 'Playfair Display, serif' }}>
+                <div key={label} className={`${bg} ${border} border rounded-xl sm:rounded-2xl px-3 sm:px-4 py-3 sm:py-3.5 text-center`}>
+                  <p className={`text-xl sm:text-2xl font-bold ${color}`} style={{ fontFamily: 'Playfair Display, serif' }}>
                     {value}
                   </p>
-                  <p className="text-[9px] sm:text-[11px] text-muted-foreground mt-0.5 font-semibold leading-tight">{label}</p>
+                  <p className="text-[10px] sm:text-[11px] text-muted-foreground mt-0.5 font-semibold leading-tight">{label}</p>
                 </div>
               ))}
             </div>
@@ -254,7 +254,7 @@ export default function HomePage() {
               {steps.map(({ icon: Icon, num, title, desc, color, shadow, ring }, i) => (
                 <div
                   key={num}
-                  className="flex-shrink-0 w-40 snap-center md:flex-shrink md:w-auto"
+                  className="flex-shrink-0 w-48 snap-center md:flex-shrink md:w-auto"
                 >
                   {/* Card */}
                   <div className={`bg-card border border-primary/10 rounded-2xl p-4 md:p-5 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group h-full flex flex-col items-center relative`}>
