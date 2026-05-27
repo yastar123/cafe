@@ -1,7 +1,7 @@
 import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
-import healthRouter from "./routes/health";
+import healthRouter from "./src/routes/health";
 import { logger } from "./lib/logger";
 
 const app: Express = express();

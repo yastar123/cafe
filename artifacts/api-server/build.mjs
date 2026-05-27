@@ -149,6 +149,8 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
   });
   // After building both bundles, copy routes to dist for serverless runtime
   await cp(path.resolve(artifactDir, "src", "routes"), path.resolve(distDir, "routes"), { recursive: true }).catch(() => {});
+  // Also copy routes to dist/src/routes to satisfy import paths used by bundled code
+  await cp(path.resolve(artifactDir, "src", "routes"), path.resolve(distDir, "src", "routes"), { recursive: true }).catch(() => {});
 }
 
 buildAll().catch((err) => {
