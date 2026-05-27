@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
+import { useCart } from '@/lib/store/cart'
 import { Button } from '@/components/ui/button'
 import { Link, useLocation } from 'wouter'
 import {
@@ -73,7 +74,10 @@ export default function OrdersPage() {
     if (user) fetchOrders()
   }, [user])
 
+  const clearCart = useCart((state) => state.clearCart)
+
   const handleLogout = () => {
+    clearCart()
     sessionStorage.removeItem('user')
     setLocation('/auth/login')
   }

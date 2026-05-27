@@ -138,7 +138,10 @@ export default function MenuPage() {
     return matchesCategory && matchesSearch
   })
 
+  const clearCart = useCart((state) => state.clearCart)
+
   const handleLogout = () => {
+    clearCart()
     sessionStorage.removeItem('user')
     setLocation('/auth/login')
   }

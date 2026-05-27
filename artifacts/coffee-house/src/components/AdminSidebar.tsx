@@ -4,6 +4,7 @@ import {
   CreditCard, Menu, X, LayoutDashboard,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useCart } from '@/lib/store/cart'
 
 export default function AdminSidebar() {
   const [pathname] = useLocation()
@@ -29,7 +30,10 @@ export default function AdminSidebar() {
     setMobileOpen(false)
   }, [pathname])
 
+  const clearCart = useCart((state) => state.clearCart)
+
   const handleLogout = () => {
+    clearCart()
     sessionStorage.removeItem('user')
     setLocation('/auth/login')
   }

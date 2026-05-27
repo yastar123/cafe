@@ -25,6 +25,7 @@ interface MenuItem {
   category: string
   price: number
   available: boolean
+  image_url?: string
 }
 
 export default function AdminMenuPage() {
@@ -33,7 +34,7 @@ export default function AdminMenuPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
   const [formData, setFormData] = useState({
-    name: '', description: '', category: 'Coffee', price: '', available: true,
+    name: '', description: '', category: 'Coffee', price: '', available: true, image_url: '',
   })
 
   useEffect(() => { fetchItems() }, [])
@@ -56,15 +57,15 @@ export default function AdminMenuPage() {
       if (editingItem) {
         const { error } = await supabase
           .from('menu_items')
-          .update({ name: formData.name, description: formData.description, category: formData.category, price: parsedPrice, available: formData.available })
+          .update({ name: formData.name, description: formData.description, category: formData.category, price: parsedPrice, available: formData.available, image_url: formData.image_url || null })
           .eq('id', editingItem.id)
         if (error) { toast.error('Gagal memperbarui: ' + error.message); return }
-        setItems(items.map((item) => item.id === editingItem.id ? { ...item, ...formData, price: parsedPrice } : item))
+        setItems(items.map((item) => item.id === editingItem.id ? { ...item, ...formData, price: parsedPrice, image_url: formData.image_url || undefined } : item))
         toast.success('Menu berhasil diperbarui')
       } else {
         const { data, error } = await supabase
           .from('menu_items')
-          .insert([{ name: formData.name, description: formData.description, category: formData.category, price: parsedPrice, available: formData.available }])
+          .insert([{ name: formData.name, description: formData.description, category: formData.category, price: parsedPrice, available: formData.available, image_url: formData.image_url || null }])
           .select()
         if (error) { toast.error('Gagal menambahkan: ' + error.message); return }
         if (data) setItems([...items, data[0]])
@@ -76,7 +77,7 @@ export default function AdminMenuPage() {
 
   const handleEdit = (item: MenuItem) => {
     setEditingItem(item)
-    setFormData({ name: item.name, description: item.description || '', category: item.category, price: item.price.toString(), available: item.available })
+    setFormData({ name: item.name, description: item.description || '', category: item.category, price: item.price.toString(), available: item.available, image_url: item.image_url || '' })
     setIsDialogOpen(true)
   }
 
@@ -99,7 +100,7 @@ export default function AdminMenuPage() {
   const handleDialogClose = () => {
     setIsDialogOpen(false)
     setEditingItem(null)
-    setFormData({ name: '', description: '', category: 'Coffee', price: '', available: true })
+    setFormData({ name: '', description: '', category: 'Coffee', price: '', available: true, image_url: '' })
   }
 
   const categories = Array.from(new Set(items.map((i) => i.category)))
@@ -140,6 +141,10 @@ export default function AdminMenuPage() {
               <div className="space-y-1.5">
                 <Label htmlFor="description">Deskripsi</Label>
                 <Input id="description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="border-primary/20" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="image_url">URL Gambar <span className="text-muted-foreground font-normal">(Opsional)</span></Label>
+                <Input id="image_url" type="url" placeholder="https://..." value={formData.image_url} onChange={(e) => setFormData({ ...formData, image_url: e.target.value })} className="border-primary/20" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
