@@ -103,6 +103,11 @@ export default function CheckoutPage() {
       toast.error('Bukti pembayaran wajib diunggah')
       return
     }
+    if (paymentProof && paymentProof.size > 5 * 1024 * 1024) {
+      setError('Ukuran file bukti pembayaran maksimal 5 MB')
+      toast.error('Ukuran file terlalu besar (maks. 5 MB)')
+      return
+    }
 
     setIsLoading(true)
     setError(null)

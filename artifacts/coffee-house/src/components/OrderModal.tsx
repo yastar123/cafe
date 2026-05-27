@@ -81,14 +81,15 @@ export default function OrderModal({
     fetchOrderItems()
   }, [isOpen, order.id, order.payment_status, order.order_status])
 
-  const handleUpdate = async () => {
+  const handleUpdate = () => {
     const updates: Partial<Order> = {}
     if (paymentStatus !== order.payment_status) updates.payment_status = paymentStatus
     if (orderStatus !== order.order_status) updates.order_status = orderStatus
 
     if (Object.keys(updates).length > 0) {
       onUpdate(order.id, updates)
-      toast.success('Status pesanan berhasil diperbarui')
+    } else {
+      toast.info('Tidak ada perubahan status')
     }
   }
 

@@ -93,7 +93,7 @@ export default function AdminOrdersPage() {
       <div className="flex justify-between items-start mb-6">
         <div className="flex items-start gap-3">
           <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mt-0.5">
-            <ShoppingCart className="h-4.5 w-4.5 text-primary" />
+            <ShoppingCart className="h-4 w-4 text-primary" />
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground" style={{ fontFamily: 'Playfair Display, serif' }}>

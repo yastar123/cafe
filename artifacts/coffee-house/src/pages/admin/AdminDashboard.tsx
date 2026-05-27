@@ -111,13 +111,13 @@ export default function AdminDashboard() {
 
       {/* Stat cards */}
       {isLoading ? (
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="h-28 rounded-2xl bg-primary/5 animate-pulse" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
           {statCards.map((stat) => {
             const Icon = stat.icon
             return (

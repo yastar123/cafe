@@ -127,7 +127,7 @@ export default function OrderSuccessPage() {
                     Kembali ke Menu <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/menu" className="sm:flex-none">
+                <Link href="/orders" className="sm:flex-none">
                   <Button variant="outline" className="w-full sm:w-auto border-primary/20 rounded-xl h-11 text-primary hover:bg-primary/5 px-5">
                     Pantau Pesanan
                   </Button>

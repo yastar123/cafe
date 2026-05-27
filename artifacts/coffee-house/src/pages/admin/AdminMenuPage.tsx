@@ -4,10 +4,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Trash2, Edit2, Plus, Coffee, ToggleLeft, ToggleRight } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatRupiah } from '@/lib/utils'
+
+const MENU_CATEGORIES = [
+  { value: 'Coffee', label: 'Coffee' },
+  { value: 'Tea', label: 'Tea' },
+  { value: 'Cold Drinks', label: 'Cold Drinks' },
+  { value: 'Pastries', label: 'Pastries' },
+  { value: 'Sandwiches', label: 'Sandwiches' },
+]
 
 interface MenuItem {
   id: string
@@ -24,7 +33,7 @@ export default function AdminMenuPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
   const [formData, setFormData] = useState({
-    name: '', description: '', category: 'Kopi', price: '', available: true,
+    name: '', description: '', category: 'Coffee', price: '', available: true,
   })
 
   useEffect(() => { fetchItems() }, [])
@@ -90,7 +99,7 @@ export default function AdminMenuPage() {
   const handleDialogClose = () => {
     setIsDialogOpen(false)
     setEditingItem(null)
-    setFormData({ name: '', description: '', category: 'Kopi', price: '', available: true })
+    setFormData({ name: '', description: '', category: 'Coffee', price: '', available: true })
   }
 
   const categories = Array.from(new Set(items.map((i) => i.category)))
@@ -112,7 +121,7 @@ export default function AdminMenuPage() {
             <Button
               className="bg-primary hover:bg-primary/90 flex-shrink-0"
               size="sm"
-              onClick={() => { setEditingItem(null); setFormData({ name: '', description: '', category: 'Kopi', price: '', available: true }); setIsDialogOpen(true) }}
+              onClick={() => { setEditingItem(null); setFormData({ name: '', description: '', category: 'Coffee', price: '', available: true }); setIsDialogOpen(true) }}
             >
               <Plus className="h-4 w-4 mr-1.5" />
               Tambah Menu
@@ -135,7 +144,16 @@ export default function AdminMenuPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="category">Kategori</Label>
-                  <Input id="category" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} required className="border-primary/20" />
+                  <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
+                    <SelectTrigger id="category" className="border-primary/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MENU_CATEGORIES.map((c) => (
+                        <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="price">Harga (Rp)</Label>
