@@ -1,27 +1,8 @@
 import express, { type Express } from "express";
 import cors from "cors";
-import pinoHttp from "pino-http";
-import healthRouter from "./src/routes/health";
-import { logger } from "./lib/logger";
+import healthRouter from "./routes/health";
 
 const app: Express = express();
-
-if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
-  app.use(
-    (pinoHttp as any)({
-      logger,
-      serializers: {
-        req(req: any) {
-          return { id: req.id, method: req.method, url: req.url?.split("?")[0] };
-        },
-        res(res: any) {
-          return { statusCode: res.statusCode };
-        },
-      },
-    })
-  );
-}
-
 
 app.use(cors());
 app.use(express.json());
@@ -30,3 +11,4 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", healthRouter);
 
 export default app;
+
