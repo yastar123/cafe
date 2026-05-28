@@ -58951,9 +58951,12 @@ var import_multer = __toESM(require_multer(), 1);
 import path from "path";
 import fs from "fs";
 var router7 = (0, import_express7.Router)();
-var uploadsDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+var uploadsDir = "/tmp/uploads";
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch {
 }
 var storage = import_multer.default.diskStorage({
   destination: (_req, _file, cb) => {

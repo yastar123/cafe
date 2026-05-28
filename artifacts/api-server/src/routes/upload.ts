@@ -6,9 +6,13 @@ import { requireAuth, requireAdmin } from "../lib/auth.js";
 
 const router = Router();
 
-const uploadsDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+const uploadsDir = "/tmp/uploads";
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch {
+  // Vercel serverless can only write to /tmp and may fail in some cold starts.
 }
 
 const storage = multer.diskStorage({
