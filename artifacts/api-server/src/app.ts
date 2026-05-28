@@ -1,6 +1,6 @@
 import express, { type Express } from "express";
-import cors from "cors";
-import healthRouter from "./routes/health.js";
+import cors, { type CorsOptions } from "cors";
+import apiRouter from "./routes/index.js";
 import bcrypt from "bcryptjs";
 import { db } from "@workspace/db";
 import { users } from "@workspace/db";
@@ -42,11 +42,26 @@ async function ensureAdminSeed(): Promise<void> {
 
 const app: Express = express();
 
-app.use(cors());
+const corsOptions: CorsOptions = {
+  origin: [
+    "https://cafe-coffee-house.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000",
+  ],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(async (_req, _res, next) => {
+app.use(async (req, _res, next) => {
   try {
+    if (req.method === "OPTIONS") {
+      next();
+      return;
+    }
     adminSeedPromise ??= ensureAdminSeed();
     await adminSeedPromise;
     next();
@@ -55,7 +70,7 @@ app.use(async (_req, _res, next) => {
   }
 });
 
-app.use("/api", healthRouter);
+app.use("/api", apiRouter);
 
 export default app;
 
