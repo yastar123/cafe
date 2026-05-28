@@ -2,7 +2,7 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { orders, orderItems, menuItems, users } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
-import { requireAuth, requireAdmin } from "../lib/auth";
+import { requireAuth, requireAdmin } from "../lib/auth.js";
 import { z } from "zod";
 
 const router = Router();

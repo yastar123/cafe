@@ -1,13 +1,13 @@
 import { Router } from "express";
-import healthRouter from "./health";
-import authRouter from "./auth";
-import menuRouter from "./menu";
-import ordersRouter from "./orders";
-import usersRouter from "./users";
-import paymentsRouter from "./payments";
-import uploadRouter from "./upload";
-import categoriesRouter from "./categories";
-import rekapRouter from "./rekap";
+import healthRouter from "./health.js";
+import authRouter from "./auth.js";
+import menuRouter from "./menu.js";
+import ordersRouter from "./orders.js";
+import usersRouter from "./users.js";
+import paymentsRouter from "./payments.js";
+import uploadRouter from "./upload.js";
+import categoriesRouter from "./categories.js";
+import rekapRouter from "./rekap.js";
 
 const router = Router();
 

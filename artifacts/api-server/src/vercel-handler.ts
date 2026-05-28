@@ -1,4 +1,4 @@
 import "dotenv/config";
-import app from "./app";
+import app from "./app.js";
 
 export default (req: any, res: any) => app(req, res);

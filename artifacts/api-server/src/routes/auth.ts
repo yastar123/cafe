@@ -3,7 +3,7 @@ import { db } from "@workspace/db";
 import { users } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
-import { createSession, deleteSession, requireAuth } from "../lib/auth";
+import { createSession, deleteSession, requireAuth } from "../lib/auth.js";
 import { z } from "zod";
 
 const router = Router();
