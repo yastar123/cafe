@@ -39,9 +39,10 @@ function getImageUrl(item: MenuItem): string {
 }
 
 async function uploadMenuImage(file: File, token: string): Promise<string> {
+  const apiOrigin = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, "") || "https://cafe-api-server.vercel.app";
   const formData = new FormData()
   formData.append('file', file)
-  const res = await fetch('/api/upload/menu-image', {
+  const res = await fetch(`${apiOrigin}/api/upload/menu-image`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
     body: formData,

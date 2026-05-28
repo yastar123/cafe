@@ -1,4 +1,5 @@
-const API_BASE = "/api";
+const API_ORIGIN = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, "") || "https://cafe-api-server.vercel.app";
+const API_BASE = `${API_ORIGIN}/api`;
 
 function getToken(): string | null {
   return sessionStorage.getItem("authToken");
