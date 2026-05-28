@@ -1,41 +1,37 @@
 import { Router } from "express";
 import multer from "multer";
-import path from "path";
-import fs from "fs";
+import { v2 as cloudinary } from "cloudinary";
 import { requireAuth, requireAdmin } from "../lib/auth.js";
 
 const router = Router();
 
-const uploadsDir = "/tmp/uploads";
-try {
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-  }
-} catch {
-  // Vercel serverless can only write to /tmp and may fail in some cold starts.
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+  throw new Error("Cloudinary environment variables are required");
 }
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const name = `proof_${Date.now()}_${Math.random().toString(36).slice(2)}${ext}`;
-    cb(null, name);
-  },
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const menuImageStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const name = `menu_${Date.now()}_${Math.random().toString(36).slice(2)}${ext}`;
-    cb(null, name);
-  },
-});
+const storage = multer.memoryStorage();
+
+function uploadToCloudinary(buffer: Buffer, folder: string): Promise<{ url: string; publicId: string }> {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder, resource_type: "image" },
+      (error, result) => {
+        if (error || !result) {
+          reject(error ?? new Error("Cloudinary upload failed"));
+          return;
+        }
+        resolve({ url: result.secure_url, publicId: result.public_id });
+      },
+    );
+    stream.end(buffer);
+  });
+}
 
 const upload = multer({
   storage,
@@ -49,43 +45,28 @@ const upload = multer({
   },
 });
 
-const uploadMenuImage = multer({
-  storage: menuImageStorage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true);
-    } else {
-      cb(new Error("Hanya file gambar yang diizinkan"));
-    }
-  },
-});
+const uploadMenuImage = upload;
 
-router.post("/upload/payment-proof", requireAuth, upload.single("file"), (req, res) => {
+router.post("/upload/payment-proof", requireAuth, upload.single("file"), async (req, res) => {
   if (!req.file) {
     res.status(400).json({ error: "File tidak ditemukan" });
     return;
   }
-  const fileUrl = `/api/uploads/${req.file.filename}`;
-  res.json({ url: fileUrl, filename: req.file.filename });
+  const data = await uploadToCloudinary(req.file.buffer, "cafe/payment-proof");
+  res.json({ url: data.url, filename: data.publicId });
 });
 
-router.post("/upload/menu-image", requireAdmin, uploadMenuImage.single("file"), (req, res) => {
+router.post("/upload/menu-image", requireAdmin, uploadMenuImage.single("file"), async (req, res) => {
   if (!req.file) {
     res.status(400).json({ error: "File tidak ditemukan" });
     return;
   }
-  const fileUrl = `/api/uploads/${req.file.filename}`;
-  res.json({ url: fileUrl, filename: req.file.filename });
+  const data = await uploadToCloudinary(req.file.buffer, "cafe/menu");
+  res.json({ url: data.url, filename: data.publicId });
 });
 
-router.get("/uploads/:filename", (req, res) => {
-  const filePath = path.join(uploadsDir, req.params.filename);
-  if (!fs.existsSync(filePath)) {
-    res.status(404).json({ error: "File tidak ditemukan" });
-    return;
-  }
-  res.sendFile(filePath);
+router.get("/uploads/:filename", (_req, res) => {
+  res.status(410).json({ error: "Penyimpanan lokal tidak didukung di Vercel. Gunakan URL Cloudinary." });
 });
 
 export default router;
